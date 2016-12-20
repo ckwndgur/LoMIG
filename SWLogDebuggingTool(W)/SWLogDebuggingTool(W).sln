@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SWLogDebuggingTool(W)", "SWLogDebuggingTool(W).vcproj", "{AB117A70-3298-4075-A9FB-E1B92524BB5D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AB117A70-3298-4075-A9FB-E1B92524BB5D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{AB117A70-3298-4075-A9FB-E1B92524BB5D}.Debug|Win32.Build.0 = Debug|Win32
+		{AB117A70-3298-4075-A9FB-E1B92524BB5D}.Release|Win32.ActiveCfg = Release|Win32
+		{AB117A70-3298-4075-A9FB-E1B92524BB5D}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
