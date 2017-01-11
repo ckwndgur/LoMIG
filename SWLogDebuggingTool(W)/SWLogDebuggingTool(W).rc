@@ -308,6 +308,7 @@ BEGIN
         MENUITEM "액세스별 정렬(&E)",                 ID_SORTING_SORTBYACCESS
         MENUITEM "형식별 그룹화(&Y)",                 ID_SORTING_GROUPBYTYPE
         MENUITEM "파일 요청",                       ID_Log_Req
+        MENUITEM "Agent로그 경로 수정",               ID_AgentDirChange
     END
 END
 

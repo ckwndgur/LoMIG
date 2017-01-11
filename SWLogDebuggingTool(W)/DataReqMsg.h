@@ -13,4 +13,5 @@ struct DataReqMsgStruct
 	char cWatcherIP[15];
 	int iWatcherPort;
 	char cReqFileName[256];
+	char cFileDir[256];
 };

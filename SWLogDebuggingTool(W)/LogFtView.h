@@ -11,7 +11,7 @@ class LogFtView : public CScrollView
 {
 	DECLARE_DYNCREATE(LogFtView)
 
-	
+
 protected:
 	LogFtView();           // protected constructor used by dynamic creation
 	virtual ~LogFtView();
@@ -28,19 +28,19 @@ public:
 
 	//func
 private:
-		CWnd m_EditSearch;
-		CWnd m_ButtonSearch;
-		CComboBox m_ComboBox;
+	CWnd m_EditSearch;
+	CWnd m_ButtonSearch;
+	CComboBox m_ComboBox;
 	//view
-		Filter mFilter;
+	Filter mFilter;
 	//class
-		list<CString> m_strFilteredData;
-		bool bCListCnt;
+	list<CString> m_strFilteredData;
+	bool bCListCnt;
 	//var
-		void FillFtView(list<CString> input, CDC* pdc);
-		void SetScrollView(int x, int y);
-		CSize CalViewSize(int x, int y);
-		void initClistCnt();
+	void FillFtView(list<CString> input, CDC* pdc);
+	void SetScrollView(int x, int y);
+	CSize CalViewSize(int x, int y);
+	void initClistCnt();
 	//func
 
 public:
@@ -60,5 +60,3 @@ protected:
 public:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 };
-
-

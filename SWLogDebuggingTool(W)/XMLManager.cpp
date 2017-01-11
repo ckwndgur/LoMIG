@@ -154,6 +154,23 @@ bool XMLManager::EditElementXML(string ChildTitle, string ChildElement, string C
 	return true;
 }
 
+bool XMLManager::Target_EditElementXML(string sTargetDir, string ChildTitle, string ChildElement, string Contents)
+{
+	if (mXMLDocument.LoadFile(sTargetDir.c_str()) == false)
+	{
+		mNode = mXMLDocument.FirstChildElement(ChildTitle.c_str())->FirstChildElement(ChildElement.c_str());
+		mNode->ToElement()->SetText(Contents.c_str());
+
+		mXMLDocument.SaveFile(sTargetDir.c_str());
+		mXMLDocument.Clear();
+		return false;
+	} 
+	else
+	{
+		return true;
+	}
+}
+
 string XMLManager::ParsingXML(string ChildTitle, string ChildElement)
 {
 	if (mXMLDocument.LoadFile(sConfigFileDirectory.c_str()) == false)

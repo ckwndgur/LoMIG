@@ -71,10 +71,13 @@ BEGIN_MESSAGE_MAP(CClassView, CDockablePane)
 	ON_COMMAND(ID_Info_Req, &CClassView::OnInfoReq)
 	ON_COMMAND(ID_Info_Load, &CClassView::OnInfoLoad)
 	ON_COMMAND(ID_AGENT_RscReq, &CClassView::OnAgentRscreq)
-	//ON_NOTIFY(TVN_SELCHANGED, IDC_MY_TREE_VIEW, &OnAgentRcsoReq_OnClick)
+	ON_NOTIFY(NM_RETURN, IDC_MY_TREE_VIEW, &OnSelchangedTree)
+	ON_NOTIFY(TVN_SELCHANGED, IDC_MY_TREE_VIEW, &OnSelchangedTree)
 	ON_NOTIFY(NM_CLICK, IDC_MY_TREE_VIEW, &OnAgentRcsoReq_OnClick)
+	ON_NOTIFY(TVN_ENDLABELEDIT, IDC_MY_TREE_VIEW, &OnEndLabelEditTreeCtrl)
 	ON_MESSAGE(WM_TREEVIEW_REFRESH_EVENT, Treeview_Refresh)
 
+	ON_COMMAND(ID_AgentDirChange, &CClassView::OnAgentdirchange)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -236,8 +239,7 @@ void CClassView::FillClassView()
 				sFileDIrChk = mUserConfig.GetExeDirectory()+"AgtInfo\\" + FindData.cFileName;
 				AgentXMLList.push_back(m_XMLManager.Parsing_Target_XML(sFileDIrChk, "AgentInfo", "AgentIP"));
 				AgentXMLList.push_back(m_XMLManager.Parsing_Target_XML(sFileDIrChk, "AgentInfo", "AgentName"));
-				//AgentXMLList.push_back(m_XMLManager.Parsing_Target_XML(sFileDIrChk, "AgentInfo", "AgentLogFileDirectory"));
-				AgentXMLList.push_back(m_XMLManager.Parsing_Target_XML(sFileDIrChk, "AgentInfo", "AgentLogDir"));
+				AgentXMLList.push_back(m_XMLManager.Parsing_Target_XML(sFileDIrChk, "AgentInfo", "AgentLogFileDirectory"));
 				AgentXMLList.push_back(m_XMLManager.Parsing_Target_XML(sFileDIrChk, "AgentInfo", "AgentLogFileList"));
 			}
 		}
@@ -260,18 +262,19 @@ void CClassView::FillClassView()
 			hClass = m_wndClassView.InsertItem(_T(sListElement.c_str()), 1, 1, hRoot);
 			
 			iterStartList++;
-			
 			hSrc = m_wndClassView.InsertItem((*iterStartList).c_str(), 0, 0, hClass);
+
 			//C:\Temp\CoreDebug
 	//<<<<<<< HEAD
-			/*int index = 0;
+	/*
+			int index = 0;
 			CString str = (*iterStartList).c_str();
 			index = m_TreeviewManager.GetCharNumber(str, '\\') - 2;
 
 			CString temp;
 			AfxExtractSubString(temp, str, index + 2, '\\');
 			hSrc = m_wndClassView.InsertItem(temp, 0, 0, hClass);
-			*/
+	*/
 	//=======
 	// 		int index = 0;
 	// 		CString str = (*iterStartList).c_str();
@@ -527,7 +530,7 @@ void CClassView::OnInfoReq()
 	//mUDPCommunication.InforReq(iUdpMultiSock, MY_UDP_PORT, "192.168.0.12");
 
 	//Non-Thread InfoRcv
-	memset(&AddrStruct, 0, sizeof(AddrStruct));
+	/*memset(&AddrStruct, 0, sizeof(AddrStruct));
 	AddrStruct.sin_family = AF_INET;
 	AddrStruct.sin_addr.s_addr = htonl(INADDR_ANY);
 	AddrStruct.sin_port = htons(MY_UDP_PORT);
@@ -535,9 +538,10 @@ void CClassView::OnInfoReq()
 
 	mUDPCommunication.RcvInfor(iUdpUniSock, 4);
 	RefreshClassView();
+	*/
 
+	
 	//Thread InfoRcv
-	/*
 	CWinThread *InfoRcvThread = NULL;
 	InfoRcvThread = AfxBeginThread(Thread_Info_Rcv,this);
 
@@ -664,6 +668,54 @@ void CClassView::DisplayAllElement_List(list<string> lList)
 	}
 }
 
+//Agent에 사용자가 설정한 파일경로를 전송하기위한 기능
+UINT CClassView::Thread_AgentDirChange(LPVOID pParam)
+{
+	TCPCommunication mTCPCommunication;
+	XMLManager mXMLManager;
+	UserConfig mUserConfig;
+	int iTCPSocket = 0;
+
+	CClassView *Thread_View = (CClassView*)pParam;
+
+	HTREEITEM hItem = m_wndClassView.GetSelectedItem();
+	HTREEITEM hParents;
+
+	string sAgentLogDir = "";
+	int iIndex = 0;
+
+	string sAgentIPwithName = "";
+	string sAgentIP = "";
+
+	if(hItem != NULL)
+	{
+		sAgentLogDir = m_wndClassView.GetItemText(hItem);
+		iIndex = sAgentLogDir.find_first_of("\\");
+	}
+	if(iIndex != -1)
+		//선택한 것이 파일 경로인 경우 기능실행
+	{
+		
+		hParents = m_wndClassView.GetParentItem(hItem);
+		sAgentIPwithName = m_wndClassView.GetItemText(hParents);
+		
+		iIndex = sAgentIPwithName.find_first_of("/");
+		sAgentIP = sAgentIPwithName.substr(0, iIndex);
+		char* pcAgtIP = &sAgentIP[0u];
+
+		mTCPCommunication.TCPSockInit(iTCPSocket);
+		if(mTCPCommunication.TryCnct(iTCPSocket, pcAgtIP, MY_TCP_PORT) == TRUE)
+		{
+			mTCPCommunication.AgentDirChange(iTCPSocket, sAgentLogDir);
+		}
+		else
+		{
+
+		}
+	}
+	return 0;
+}
+
 //TCP File Rcv using Thread
 UINT CClassView::Thread_Log_Req(LPVOID pParam)
 {
@@ -685,6 +737,7 @@ UINT CClassView::Thread_Log_Req(LPVOID pParam)
 	string sLogDir = "";
 	string sAgentIPwithName = "";
 	string sAgentIP = "";
+	string sFileDir = "";
 	stringstream sDate;
 	BOOL bSuccessFlag = FALSE;
 	int iIndex = 0;
@@ -716,10 +769,11 @@ UINT CClassView::Thread_Log_Req(LPVOID pParam)
 			int iToday = (tTimer_St.tm_year + 1900) * 10000 + (tTimer_St.tm_mon + 1) * 100 + (tTimer_St.tm_mday);	
 			sDate << iToday;
 
+			sFileDir = m_wndClassView.GetItemText(hParents);
 			sLogDir = mXMLManager.Parsing_Target_XML(mUserConfig.GetExeDirectory() + "Config.xml", "CommonPath", "Watcher");
 			sLogDir += "\\" + sDate.str() + "\\" + sAgentIP + "\\";
 
-			mTCPCommunication.LogFileReq(iTCPSocket, sLogDir, sLogFileName);
+			mTCPCommunication.LogFileReq(iTCPSocket, sLogDir, sLogFileName, sFileDir);
 		}
 		else
 		{
@@ -742,6 +796,7 @@ UINT CClassView::Thread_Log_Req(LPVOID pParam)
 			mTCPCommunication.TCPSockInit(iTCPSocket);
 			//노드에 존재하는 모든 파일의 갯수를 구함
 			hChild = m_wndClassView.GetChildItem(hItem);
+			sFileDir = m_wndClassView.GetItemText(hChild);
 			hGrandChild = m_wndClassView.GetChildItem(hChild);
 			while(hGrandChild = m_wndClassView.GetNextSiblingItem(hGrandChild))
 			{
@@ -769,7 +824,7 @@ UINT CClassView::Thread_Log_Req(LPVOID pParam)
 				{
 					Sleep(200);
 					sLogFileName = m_wndClassView.GetItemText(hGrandChild);
-					mTCPCommunication.LogFileReq(iTCPSocket, sLogDir, sLogFileName);
+					mTCPCommunication.LogFileReq(iTCPSocket, sLogDir, sLogFileName, sFileDir);
 				}
 				else
 				{
@@ -1167,3 +1222,31 @@ void CClassView::OnMultiSelect()
 	}
 }
 */
+void CClassView::OnAgentdirchange()
+{
+	// TODO: Add your command handler code here
+	CWinThread *AgtDirChgThread = NULL;
+	AgtDirChgThread = AfxBeginThread(Thread_AgentDirChange,this);
+}
+
+void CClassView::OnEndLabelEditTreeCtrl(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	TV_DISPINFO* pTVDispInfo = (TV_DISPINFO*)pNMHDR;
+	//pTVDiapInfo 멤버 item의 pszText를 현재 수정하고자 하는
+	//아이템으로 설정한다.
+	m_wndClassView.SetItemText(hCurItem, pTVDispInfo->item.pszText);
+	*pResult = 0;
+}
+
+void CClassView::OnSelchangedTree(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
+	//선택된 아이템을 hCurItem에 설정한다.
+	//헤더부의 ⓢ-① 참조
+	hCurItem=pNMTreeView->itemNew.hItem;
+	//GetItemText 함수를 이용하여 새롭게 설정된 아이템의 hItem을
+	//넘겨서 문자열을 얻는다.
+	CString data=m_wndClassView.GetItemText(pNMTreeView->itemNew.hItem);
+	//에디터 윈도에 설정한다.
+	*pResult = 0;
+}

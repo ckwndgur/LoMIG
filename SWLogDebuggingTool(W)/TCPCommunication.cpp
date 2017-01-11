@@ -243,13 +243,29 @@ void TCPCommunication::LogFileSnd(int iRcvSocket, char* cFileDir, char* cFileNam
 	}
 }
 
-void TCPCommunication::LogFileReq(int& iRcvSocket, string sSaveDir, string sReqFileName)
+void TCPCommunication::AgentDirChange(int &iRcvSocket,string sChangeDir)
+{
+	struct DataReqMsgStruct MyDataReqMsg;
+	
+	memset(&MyDataReqMsg, 0, sizeof(struct DataReqMsgStruct));
+
+	MyDataReqMsg.nReqType = 5;
+	memcpy(&MyDataReqMsg.cFileDir, sChangeDir.c_str(), strlen(sChangeDir.c_str()));
+
+
+	send(iRcvSocket, (char*)&MyDataReqMsg, sizeof(struct DataReqMsgStruct), 0);
+	Sleep(1);
+
+	shutdown(iRcvSocket, SD_SEND);
+	closesocket(iRcvSocket);
+}
+
+void TCPCommunication::LogFileReq(int& iRcvSocket, string sSaveDir, string sReqFileName, string sFileDir)
 {
 	char cWtcName[64];
 	char* cSaveDir;
 	char* cReqFileName;
 	string sWatcherIP = "";
-	string sLogDir = "";
 	string sWriteData = "";
 	string sBuf = "";
 	string sAgentIP = "";
@@ -257,6 +273,7 @@ void TCPCommunication::LogFileReq(int& iRcvSocket, string sSaveDir, string sReqF
 	struct DataReqMsgStruct MyDataReqMsg;
 	struct AgtDataMsgStruct MyAgtDataMsg;
 	PHOSTENT pHostInfo;
+	int iBreaker = 0;
 
 	memset(cWtcName, 0, sizeof(cWtcName));
 	memset(&MyDataReqMsg, 0, sizeof(struct DataReqMsgStruct));
@@ -270,6 +287,7 @@ void TCPCommunication::LogFileReq(int& iRcvSocket, string sSaveDir, string sReqF
 	}
 
 	//port 1883;
+	memcpy(&MyDataReqMsg.cFileDir, sFileDir.c_str(), strlen(sFileDir.c_str()));
 	memcpy(&MyDataReqMsg.cWatcherIP, sWatcherIP.c_str(), strlen(sWatcherIP.c_str()));
 	memcpy(&MyDataReqMsg.cReqFileName, sReqFileName.c_str(), strlen(sReqFileName.c_str()));
 	MyDataReqMsg.iWatcherPort = TCP_PORT;
@@ -300,7 +318,10 @@ void TCPCommunication::LogFileReq(int& iRcvSocket, string sSaveDir, string sReqF
 		}
 		else
 		{
+			iBreaker++;
 			if(MyAgtDataMsg.bLastPacket)
+				break;
+			if(iBreaker == 2500)
 				break;
 		}
 	}

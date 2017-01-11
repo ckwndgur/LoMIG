@@ -40,7 +40,7 @@ public:
 	CWnd m_ButtonSearch;
 
 	list<CString> m_strFilteredData;
-	
+
 
 	CString filterform;
 
@@ -59,9 +59,7 @@ public:
 protected:
 	virtual void OnDraw(CDC* pDC);      // overridden to draw this view
 	virtual void OnInitialUpdate();     // first time after construct
-	
+
 
 	DECLARE_MESSAGE_MAP()
 };
-
-

@@ -59,6 +59,10 @@ public:
 	HTREEITEM hSrc;
 	HTREEITEM hInc;
 	HTREEITEM hClass;
+
+	//항목선택 시 선택한 항목이 저장되는 변수
+	HTREEITEM hCurItem;
+
 	//For Multi Select
 	HTREEITEM m_hItemFirstSel;
 	DWORD m_dwDragStart;
@@ -85,6 +89,7 @@ public:
 	BOOL	m_bMultiSelect;
 
 	void FillClassView();
+	static UINT Thread_AgentDirChange(LPVOID pParam);
 	static UINT Thread_Log_Req(LPVOID pParam);
 	static UINT Thread_Info_Rcv(LPVOID pParam);
 	static UINT Thread_RcsReq_Click(LPVOID pParam);
@@ -111,6 +116,8 @@ protected:
 	afx_msg LRESULT OnChangeActiveTab(WPARAM, LPARAM);
 	afx_msg void OnSort(UINT id);
 	afx_msg void OnUpdateSort(CCmdUI* pCmdUI);
+	afx_msg void OnEndLabelEditTreeCtrl(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnSelchangedTree(NMHDR* pNMHDR, LRESULT* pResult);
 	//afx_msg void OnMultiSelect();
 
 	DECLARE_MESSAGE_MAP()
@@ -121,5 +128,6 @@ public:
 	afx_msg void OnAgentRscreq();
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+	afx_msg void OnAgentdirchange();
 };
 

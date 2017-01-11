@@ -41,7 +41,6 @@ void LogFtView::OnInitialUpdate()
 /*
 	m_ButtonSearch.Create(TEXT("BUTTON"), TEXT("Search"), WS_CHILD|WS_VISIBLE|BS_PUSHBUTTON, CRect(300,0,450,20),this,1233);
 	m_EditSearch.Create(TEXT("EDIT"),TEXT(""), WS_CHILD|WS_VISIBLE|WS_BORDER, CRect(150,0,300,20), this, 1232);
-
 	m_ComboBox.Create(WS_CHILD | WS_VISIBLE | WS_VSCROLL | CBS_DROPDOWN, CRect(0,0,150,140), this, 123);
 	m_ComboBox.AddString("1. ErrorLevel");
 	m_ComboBox.AddString("2. Time");
@@ -90,7 +89,6 @@ void LogFtView::initClistCnt()
 	// 항목 추가
 	m_list.InsertItem(0, "1", 0);
 	m_list.InsertItem(1, "2", 0);
-
 	// 하위 항목 추가
 	m_list.SetItemText(0, 1, "ERROR");
 	m_list.SetItemText(0, 2, "20161114");

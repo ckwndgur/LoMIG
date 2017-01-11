@@ -36,7 +36,6 @@ BEGIN_MESSAGE_MAP(CPropertiesWnd, CDockablePane)
 	ON_UPDATE_COMMAND_UI(ID_PROPERTIES2, OnUpdateProperties2)
 	ON_WM_SETFOCUS()
 	ON_WM_SETTINGCHANGE()
-	ON_WM_PAINT()
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -292,11 +291,4 @@ void CPropertiesWnd::SetPropListFont()
 	m_fntPropList.CreateFontIndirect(&lf);
 
 	m_wndPropList.SetFont(&m_fntPropList);
-}
-
-void CPropertiesWnd::OnPaint()
-{
-	CPaintDC dc(this); // device context for painting
-	// TODO: Add your message handler code here
-	// Do not call CDockablePane::OnPaint() for painting messages
 }

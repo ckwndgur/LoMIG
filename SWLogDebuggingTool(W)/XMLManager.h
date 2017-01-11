@@ -25,6 +25,7 @@ public:
 
 	bool AddXML(string NodeTitle, string* ChildElement, string* Contents, int ChildCnt);
 	bool EditElementXML(string ChildTitle, string ChildElement, string Contents);
+	bool Target_EditElementXML(string sTargetDir, string ChildTitle, string ChildElement, string Contents);
 
 	string Parsing_Target_XML(string sTargetDir, string ChildTitle, string ChildElement);
 	string ParsingXML(string ChildTitle, string ChildElement);
