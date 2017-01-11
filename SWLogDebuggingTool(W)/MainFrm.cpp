@@ -139,6 +139,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	DockPane(&m_wndProperties);
 	m_wndFilter.EnableDocking(CBRS_ALIGN_ANY);
 	DockPane(&m_wndFilter);
+	
 
 	// 향상된 창 관리 대화 상자를 활성화합니다.
 	EnableWindowsDialog(ID_WINDOW_MANAGER, IDS_WINDOWS_MANAGER, TRUE);
@@ -259,6 +260,12 @@ BOOL CMainFrame::CreateDockingWindows()
 
 	SetDockingWindowIcons(theApp.m_bHiColorIcons);
 	return TRUE;
+}
+
+CDockablePane* CMainFrame::GetPropertyViewPT()
+{
+	CWnd* pWnd = (CWnd *)&m_wndProperties;
+	return (CDockablePane *)pWnd;
 }
 
 void CMainFrame::SetDockingWindowIcons(BOOL bHiColorIcons)
