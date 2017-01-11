@@ -30,7 +30,7 @@ public:
 	string Parsing_Target_XML(string sTargetDir, string ChildTitle, string ChildElement);
 	string ParsingXML(string ChildTitle, string ChildElement);
 
-//private:
+	//private:
 	string sConfigDirectory;
 	string sConfigFileDirectory;
 	string sConfigFileName;

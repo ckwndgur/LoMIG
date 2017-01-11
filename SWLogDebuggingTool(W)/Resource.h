@@ -104,7 +104,10 @@
 #define ID_AGENT32784                   32784
 #define ID_Info_Req                     32785
 #define ID_Info_Load                    32786
+#define ID_32787                        32787
 #define ID_FILTERING                    32788
+#define ID_AgentDirChange               32788
+
 #define WantedERROR						32789
 #define WantedDATE						32790
 #define WantedPATH						32791
@@ -112,17 +115,14 @@
 #define WantedDESCRIPTION				32793
 #define WantedTOTAL						32794
 
-//병합하면서 ID 변경
-//원본#define ID_AGENT_RscReq                 32788
-#define ID_AGENT_RscReq                 32789
+#define ID_AGENT_RscReq                 32795
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-//#define _APS_NEXT_RESOURCE_VALUE        310
 #define _APS_NEXT_RESOURCE_VALUE        312
-#define _APS_NEXT_COMMAND_VALUE         32787
+#define _APS_NEXT_COMMAND_VALUE         32789
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           310
 #endif

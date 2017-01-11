@@ -1,4 +1,3 @@
-//////////////////////////////////////////////////////////////////////////////////////////////싹다 복붙
 #include "StdAfx.h"
 #include "Filter.h"
 #include "FolderManager.h"
@@ -65,7 +64,8 @@ list<CString> Filter::MultiFilter(list<string> keywords, string Title, CString o
 		category = atoi(cateBuf.c_str()); //카테고리를 받아옵니다.
 		keywords.pop_front();
 		keywordBuf = keywords.front(); //키워드를 받아옵니다.
-				
+
+		//카테고리 기반으로 로그를 분리합니다.
 		if (multiflag == false)//다중 필터링이 아닐경우
 		{
 			linenumber = linenumber + 1; //로그의 라인 넘버를 증가시킵니다.
@@ -78,21 +78,28 @@ list<CString> Filter::MultiFilter(list<string> keywords, string Title, CString o
 			resultlog = resultlogbuf + ": "; //결과로그의 각 줄 첫부분에 원본로그의 라인넘버를 입력합니다.
 
 			devidedlog = LogDivider(category, alinelog);
-
-			if (devidedlog.find(keywordBuf)) //키워드가 해당 로그에 존재하는지 검사합니다.
-			{
-				resultlog = resultlog + alinelog; //결과에 해당 로그를 저장합니다.
-				FilteredLog.push_back(resultlog.c_str());
-				resultfile << resultlog << endl;
-			} 
-			else
-			{
-			}
+			
+			alinelog = resultlog + alinelog;
 		} 
 
 		else//다중 필터링일 경우
 		{
-			
+			valEnd  = alinelog.find(": ");
+			resultlog = alinelog.substr(0, valEnd);
+			alinelog.erase(0,valEnd+2);
+
+			devidedlog = LogDivider(category, alinelog);
+		}
+
+		//키워드가 해당 로그에 존재하는지 검사합니다.
+		if (devidedlog.find(keywordBuf))
+		{
+			resultlog = alinelog; //결과에 해당 로그를 저장합니다.
+			FilteredLog.push_back(resultlog.c_str());
+			resultfile << resultlog << endl;
+		} 
+		else
+		{
 		}
 		
 	}
@@ -102,8 +109,47 @@ list<CString> Filter::MultiFilter(list<string> keywords, string Title, CString o
 
 string Filter::LogDivider(int category, string alinelog)
 {
+	int valstart, valend, vallength;
+	valstart = valend = vallength = 0;
 	string valrtnLog;
+	
+	switch(category)
+	{
+	case 1 :
+		valend = alinelog.find(")");
+		valrtnLog = alinelog.substr(1,valend);
+		break;
 
+	case 2 :
+		valstart = alinelog.find(")[");
+		valend = alinelog.find("]__");
+		vallength = valend - valstart;
+		valrtnLog = alinelog.substr(valstart, vallength);
+		break;
+
+	case 3 :
+		valstart = alinelog.find("]__");
+		valend = alinelog.find(".");
+		valend = valend + 1;
+		vallength = valend - valstart;
+		valrtnLog = alinelog.substr(valstart, vallength);
+		break;
+
+	case 4 :
+
+		break;
+
+	case 5 :
+
+		break;
+
+	case 6 :
+
+		break;
+
+	default : AfxMessageBox(TEXT("카테고리 범주가 아닙니다."));
+		break;
+	}
 	return valrtnLog;
 }
 
@@ -140,17 +186,14 @@ list<CString> Filter::DoFilter(int Category, string WantedLog, string Title, CSt
 		}
 		AfxExtractSubString(temp, filepath, 4, '\\');
 		AfxExtractSubString(temp, temp, 0, '.');
-
 		csfilepath = csfilepath + "Debug" + '\\' + "(" + temp + ")" + Title.c_str();
 		ResultPath = csfilepath;		
 		FolderManager mFolderManager;
 		mFolderManager.MakeDirectory((LPSTR)((LPCTSTR)csfilepath));
-
 		ifstream input((CStringA)filepath, ios::in); // 
 		if(input.fail()){
 			cout << "파일을 여는 데 실패했습니다."<< endl;
 		}
-
 		ofstream output(csfilepath, ios::out); 
 		if(output.fail()){
 			cout << "파일을 쓰는 데 실패했습니다.1"<< endl;

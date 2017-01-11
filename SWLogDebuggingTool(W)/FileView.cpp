@@ -11,7 +11,6 @@
 #include "LogFileView.h"
 #include "LogFtView.h"
 #include "DFilterView.h"
-#include "PropertiesWnd.h"
 
 
 #ifdef _DEBUG
@@ -248,6 +247,7 @@ void CFileView::OnFileOpen()
 	LogFileView *pView = (LogFileView *)pChild->GetFileViewPane();
 	LogFtView *pFtView = (LogFtView *)pChild->GetFtViewPane();
 	DFilterView *pDView = (DFilterView *)pChild->GetDFilterViewPane();
+	//DFilterView *pDView = new DFilterView;
 	
 
 	if (csTVDataFilePath.GetLength() >0 )
@@ -265,12 +265,6 @@ void CFileView::OnFileOpen()
 		pView->Invalidate(TRUE);
 		
 	} 
-	
-	//property 포인터 얻어서 wm_paint 메세지 보내는 부분 : classview로 넘어가면 될듯
-	CPropertiesWnd *pProWnd = (CPropertiesWnd*)pFrame->GetPropertyViewPT();
-
-	pProWnd->Invalidate(TRUE);
-
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 }
 
@@ -387,9 +381,4 @@ void CFileView::OnLButtonDown(UINT nFlags, CPoint point)
 	}
 	
 	CWnd::OnLButtonDown(nFlags, point);
-}
-BOOL CFileView::PreTranslateMessage(MSG* pMsg)
-{
-	// TODO: Add your specialized code here and/or call the base class
-	return CDockablePane::PreTranslateMessage(pMsg);
 }

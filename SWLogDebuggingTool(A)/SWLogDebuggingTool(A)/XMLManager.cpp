@@ -1,4 +1,3 @@
-#include "StdAfx.h"
 #include "XMLManager.h"
 
 XMLManager::XMLManager(void)
@@ -32,11 +31,11 @@ void XMLManager::CreatXML_AgentInfo(string AgentName)
 {
 	sConfigFileDirectory = mUserConfig.GetExeDirectory()+"AgtInfo\\"+ AgentName + ".xml";
 	sConfigDirectory = (mUserConfig.GetExeDirectory()+"AgtInfo\\");
-	sConfigFileName = AgentName + ".xml";
+	sConfigFileName = AgentName;
 
 	string title = "AgentInfo";
-	string childelement[4] = {"AgentIP", "AgentName", "AgentLogFileList", "AgentLogDir"};
-	string contents[4] = {"ExampleIP", "ExampleName", "ExampleList", "ExampleDir"};
+	string childelement[3] = {"AgentIP", "AgentName", "AgentLogFileList"};
+	string contents[3] = {"ExampleIP", "ExampleName", "ExampleList"};
 
 	mFolderManager.MakeDirectory(&sConfigDirectory[0u],&sConfigFileName[0u]);
 
@@ -49,6 +48,7 @@ void XMLManager::CreatXML_AgentInfo(string AgentName)
 		WriteXML(title, childelement, contents, sizeof(contents)/sizeof(contents[0]));
 	}
 }
+
 
 bool XMLManager::WriteXML(string NodeTitle, string* ChildElement, string* Contents, int ChildCnt)
 {
@@ -135,23 +135,17 @@ bool XMLManager::EditElementXML(string ChildTitle, string ChildElement, string C
 	if (mXMLDocument.LoadFile(sConfigFileDirectory.c_str()) == false)
 	{
 		mNode = mXMLDocument.FirstChildElement(ChildTitle.c_str())->FirstChildElement(ChildElement.c_str());
-		if(strlen(Contents.c_str())<1)
-		{
-			return true;
-		}
-		else
-		{
-			mNode->ToElement()->SetText(Contents.c_str());
-			mXMLDocument.SaveFile(sConfigFileDirectory.c_str());
-			mXMLDocument.Clear();
-			return false;
-		}
+		mNode->ToElement()->SetText(Contents.c_str());
+
+		mXMLDocument.SaveFile(sConfigFileDirectory.c_str());
+		mXMLDocument.Clear();
+		return false;
 	} 
 	else
 	{
+
 		return true;
 	}
-	return true;
 }
 
 bool XMLManager::Target_EditElementXML(string sTargetDir, string ChildTitle, string ChildElement, string Contents)
@@ -177,7 +171,6 @@ string XMLManager::ParsingXML(string ChildTitle, string ChildElement)
 	{
 		mNode = mXMLDocument.FirstChildElement(ChildTitle.c_str())->FirstChildElement(ChildElement.c_str());
 
-
 		return (string) mNode->ToElement()->GetText();
 	} 
 	else
@@ -188,17 +181,12 @@ string XMLManager::ParsingXML(string ChildTitle, string ChildElement)
 
 string XMLManager::Parsing_Target_XML(string sTargetDir, string ChildTitle, string ChildElement)
 {
-	string sFail = "XML Parsing Fail";
 	mXMLDocument.Clear();
-	string sString;
+
 	if (mXMLDocument.LoadFile(sTargetDir.c_str()) == false)
 	{
 		mNode = mXMLDocument.FirstChildElement(ChildTitle.c_str())->FirstChildElement(ChildElement.c_str());
-		/////
-		if(mNode&&mNode->ToElement()->GetText())
-			return (string) mNode->ToElement()->GetText();
-		/////
-		return sFail;
+		return (string) mNode->ToElement()->GetText();
 	} 
 	else
 	{
