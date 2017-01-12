@@ -326,6 +326,18 @@ unsigned int __stdcall TCP_AgentLogReq_Resp(void*)
 			if(hFile == INVALID_HANDLE_VALUE)
 			{
 				printf("잘못된 파일경로\n");
+				memset(&MyAgtDataMsg, 0, sizeof(struct AgtDataMsgStruct));
+				MyAgtDataMsg.B_ERROR = TRUE;
+				if(send(iTCP_CltSock, (char*)&MyAgtDataMsg, sizeof(struct AgtDataMsgStruct), 0)==-1)
+				{
+					printf("Agent Log Trans Failed\n");
+				}
+				else
+				{
+					printf("ErrorMessage전송 완료\n");
+				}
+
+				break;
 			}
 			else
 			{
