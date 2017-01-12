@@ -12,5 +12,6 @@ struct AgtDataMsgStruct
 	short nReqType;
 	char cLogData[15000];
 	long lTotalDataSize;
+	bool B_ERROR;
 	bool bLastPacket;
 };

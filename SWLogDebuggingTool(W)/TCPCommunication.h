@@ -42,7 +42,7 @@ public:
 	void AcptCnct(int& iTCPServSock, int& iTCPCltSock);
 
 	list<string> InfoRcv(int& iTCPServSock);
-	void LogFileReq(int& iRcvSocket, string sSaveDir, string sReqFileName, string sFileDir);
+	BOOL LogFileReq(int& iRcvSocket, string sSaveDir, string sReqFileName, string sFileDir);
 	void LogFileRcv(int& iRcvSocket, char* cFileDir, char* cFileName);
 	void LogFileSnd(int iRcvSocket, char* cFileDir, char* cFileName);
 	char* ReqRsc(int& iTCPSock, float& CPUUsage, DWORD& RAMUsage);

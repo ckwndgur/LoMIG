@@ -35,7 +35,7 @@ void XMLManager::CreatXML_AgentInfo(string AgentName)
 	sConfigFileName = AgentName + ".xml";
 
 	string title = "AgentInfo";
-	string childelement[4] = {"AgentIP", "AgentName", "AgentLogFileList", "AgentLogDir"};
+	string childelement[4] = {"AgentIP", "AgentName", "AgentLogFileList", "AgentLogFileDirectory"};
 	string contents[4] = {"ExampleIP", "ExampleName", "ExampleList", "ExampleDir"};
 
 	mFolderManager.MakeDirectory(&sConfigDirectory[0u],&sConfigFileName[0u]);

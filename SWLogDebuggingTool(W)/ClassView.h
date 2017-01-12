@@ -1,9 +1,12 @@
 #pragma once
 #include <string>
 #include <sstream>
+#include <iostream>
+
 #include "ViewTree.h"
 #include "UserConfig.h"
 #include "XMLManager.h"
+#include "StringManager.h"
 #include "AgtInfoList.h"
 #include "UDPCommunication.h"
 #include "TCPCommunication.h"

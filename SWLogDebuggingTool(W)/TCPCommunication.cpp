@@ -260,7 +260,7 @@ void TCPCommunication::AgentDirChange(int &iRcvSocket,string sChangeDir)
 	closesocket(iRcvSocket);
 }
 
-void TCPCommunication::LogFileReq(int& iRcvSocket, string sSaveDir, string sReqFileName, string sFileDir)
+BOOL TCPCommunication::LogFileReq(int& iRcvSocket, string sSaveDir, string sReqFileName, string sFileDir)
 {
 	char cWtcName[64];
 	char* cSaveDir;
@@ -270,6 +270,9 @@ void TCPCommunication::LogFileReq(int& iRcvSocket, string sSaveDir, string sReqF
 	string sBuf = "";
 	string sAgentIP = "";
 	stringstream sDate;
+
+	BOOL bErrorChk;
+
 	struct DataReqMsgStruct MyDataReqMsg;
 	struct AgtDataMsgStruct MyAgtDataMsg;
 	PHOSTENT pHostInfo;
@@ -315,6 +318,11 @@ void TCPCommunication::LogFileReq(int& iRcvSocket, string sSaveDir, string sReqF
 			mTextManager.WriteText(cSaveDir, cReqFileName, sWriteData, MyAgtDataMsg.bLastPacket);
 			if(MyAgtDataMsg.bLastPacket)
 				break;
+			if(MyAgtDataMsg.b_ERROR)
+			{
+				bErrorChk = TRUE;
+				break;
+			}
 		}
 		else
 		{
@@ -322,8 +330,12 @@ void TCPCommunication::LogFileReq(int& iRcvSocket, string sSaveDir, string sReqF
 			if(MyAgtDataMsg.bLastPacket)
 				break;
 			if(iBreaker == 2500)
+			{
+				bErrorChk = TRUE;
 				break;
+			}
 		}
+		bErrorChk = FALSE;
 	}
 
 	Sleep(2);
@@ -331,6 +343,8 @@ void TCPCommunication::LogFileReq(int& iRcvSocket, string sSaveDir, string sReqF
 
 	shutdown(iRcvSocket, SD_SEND);
 	closesocket(iRcvSocket);
+
+	return bErrorChk;
 }
 
 void TCPCommunication::LogFileRcv(int& iRcvSocket, char* cFileDir, char* cFileName)
@@ -395,6 +409,7 @@ char* TCPCommunication::ReqRsc(int& iTCPSock, float& CPUUsage, DWORD& RAMUsage)
 		if(iRcvLen>0)
 			break;
 	}
+
 	CPUUsage = MyAgtRcsMsg.fCPUUsage;
 	RAMUsage = MyAgtRcsMsg.dwRAMUsage;
 	memcpy(&HDDUsage, MyAgtRcsMsg.cHDDUsage, sizeof(HDDUsage));
