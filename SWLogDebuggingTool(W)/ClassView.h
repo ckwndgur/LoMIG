@@ -97,6 +97,10 @@ public:
 	static UINT Thread_Info_Rcv(LPVOID pParam);
 	static UINT Thread_RcsReq_Click(LPVOID pParam);
 	afx_msg HRESULT Treeview_Refresh(WPARAM wParam, LPARAM lParam);
+
+	//below function is made by JH
+	void MessageToPV();
+
 private:
 	TreeviewManager m_TreeviewManager;
 
