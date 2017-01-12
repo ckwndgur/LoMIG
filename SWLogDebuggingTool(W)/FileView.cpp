@@ -439,13 +439,19 @@ BOOL CFileView::PreTranslateMessage(MSG* pMsg)
 
 				pProWnd->csWatcherFileName = csSelectedFileName;
 				pProWnd->csWatcherFileDirectory = csSelectedDirectory;
+				pProWnd->bWatcherInfo = true;
 				CString csbuf = "C:\\" + csSelectedDefault + "\\" + csSelectedDate + "\\" + csSelectedIP + "\\";
-				int ifilesize = 0;
+				
+				HANDLE hFile;
+				csSelectedDirectory += ".txt";
+				hFile = ::CreateFile(csSelectedDirectory, 0, 0, NULL, OPEN_EXISTING, 0, NULL);
+				UINT ifilesize = GetFileSize(hFile, NULL);
 				//ifilesize = mTextManager.GetFileSize((LPSTR)(LPCTSTR)csbuf, (LPSTR)(LPCTSTR)csSelectedFileName);
 				CString csfilesize = "";
 				csfilesize.Format(_T("%d"), ifilesize);
 				pProWnd->csWatcherFileSize = csfilesize;
 				
+				CloseHandle(hFile);
 
 				pProWnd->Invalidate(FALSE);
 			} 

@@ -17,6 +17,8 @@ static char THIS_FILE[]=__FILE__;
 
 CPropertiesWnd::CPropertiesWnd()
 {
+	bWatcherInfo = false;
+	bAgentInfo = false;
 }
 
 CPropertiesWnd::~CPropertiesWnd()
@@ -377,4 +379,7 @@ void CPropertiesWnd::RefreshAW()
 	pGroup2->AddSubItem(pLogProp2);
 	pGroup2->AddSubItem(pLogProp3);
 	m_wndPropList.AddProperty(pGroup2);
+
+	bWatcherInfo = false;
+	bAgentInfo = false;
 }
