@@ -25,6 +25,15 @@ char* StringManager::StringToChar(string arg)
 	return (char *)arg.c_str();
 }
 
+bool Str_replace(std::string& str, const std::string& from, const std::string& to)
+{
+	size_t start_pos = str.find(from);
+	if(start_pos == std::string::npos)
+		return false;
+	str.replace(start_pos, from.length(), to);
+	return true;
+}
+
 // CString StringManager::FindCString(CString contents, char strTok, int index)
 // {
 // 	CString cstr;

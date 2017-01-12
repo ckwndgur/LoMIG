@@ -719,6 +719,7 @@ UINT CClassView::Thread_AgentDirChange(LPVOID pParam)
 //TCP File Rcv using Thread
 UINT CClassView::Thread_Log_Req(LPVOID pParam)
 {
+	StringManager mStringManager;
 	TCPCommunication mTCPCommunication;
 	XMLManager mXMLManager;
 	UserConfig mUserConfig;
@@ -730,6 +731,7 @@ UINT CClassView::Thread_Log_Req(LPVOID pParam)
 	HTREEITEM hItem = m_wndClassView.GetSelectedItem();
 	HTREEITEM hChild;
 	HTREEITEM hGrandChild;
+	HTREEITEM hGrandChild_Next;
 	HTREEITEM hParents;
 	HTREEITEM hGrandParents;
 
@@ -738,14 +740,17 @@ UINT CClassView::Thread_Log_Req(LPVOID pParam)
 	string sAgentIPwithName = "";
 	string sAgentIP = "";
 	string sFileDir = "";
+	std::string sFileList = "";
+
 	stringstream sDate;
-	BOOL bSuccessFlag = FALSE;
+	BOOL bErrorFlag = FALSE;
 	int iIndex = 0;
 	int iNumofLog = 0;
 	int iTotalNumofLog = 0;
 
 	if(hItem != NULL)
 	{
+		//선택한 로그 파일의 이름을 가져옴
 		sLogFileName = m_wndClassView.GetItemText(hItem);
 
 		hParents = m_wndClassView.GetParentItem(hItem);
@@ -773,12 +778,33 @@ UINT CClassView::Thread_Log_Req(LPVOID pParam)
 			sLogDir = mXMLManager.Parsing_Target_XML(mUserConfig.GetExeDirectory() + "Config.xml", "CommonPath", "Watcher");
 			sLogDir += "\\" + sDate.str() + "\\" + sAgentIP + "\\";
 
-			mTCPCommunication.LogFileReq(iTCPSocket, sLogDir, sLogFileName, sFileDir);
+			bErrorFlag = mTCPCommunication.LogFileReq(iTCPSocket, sLogDir, sLogFileName, sFileDir);
 		}
 		else
 		{
 
 		}
+
+		//요청한 파일이 Agent 경로에 존재하지 않는 경우 파일을 삭제하는 코드
+		if(bErrorFlag)
+		{
+			hParents = m_wndClassView.GetParentItem(hItem);
+			
+			m_wndClassView.DeleteItem(hItem);
+			AfxMessageBox("유효하지 않은 파일입니다.");
+			sFileList = mXMLManager.Parsing_Target_XML(mUserConfig.GetExeDirectory() + "AgtInfo\\"+sAgentIP+".xml", "AgentInfo", "AgentLogFileList");
+			sLogFileName = "\n"+sLogFileName;
+
+			//mStringManager.Str_replace(sFileList, sLogFileName, "\n");
+			//mXMLManager.Target_EditElementXML(mUserConfig.GetExeDirectory() + "AgtInfo\\"+sAgentIP+".xml", "AgentInfo", "AgentLogFileList", sFileList);
+
+			//트리뷰 출력을 업데이트
+
+			m_wndClassView.Invalidate();
+			m_wndClassView.UpdateWindow();
+			m_wndClassView.Expand(hParents, TVE_EXPAND);
+		}
+		//
 	}
 	//index == -1 인 경우
 	//선택한 것이 IP와 장치이름인 경우, 해당 장치에 존재하는 모든 로그 파일을 요청함
@@ -794,6 +820,7 @@ UINT CClassView::Thread_Log_Req(LPVOID pParam)
 
 			char* pcAgtIP = &sAgentIP[0u];
 			mTCPCommunication.TCPSockInit(iTCPSocket);
+			
 			//노드에 존재하는 모든 파일의 갯수를 구함
 			hChild = m_wndClassView.GetChildItem(hItem);
 			sFileDir = m_wndClassView.GetItemText(hChild);
@@ -802,7 +829,7 @@ UINT CClassView::Thread_Log_Req(LPVOID pParam)
 			{
 				iTotalNumofLog++;
 			}
-			////
+			//
 			
 			hGrandChild = m_wndClassView.GetChildItem(hChild);
 
@@ -824,15 +851,36 @@ UINT CClassView::Thread_Log_Req(LPVOID pParam)
 				{
 					Sleep(200);
 					sLogFileName = m_wndClassView.GetItemText(hGrandChild);
-					mTCPCommunication.LogFileReq(iTCPSocket, sLogDir, sLogFileName, sFileDir);
+					bErrorFlag = mTCPCommunication.LogFileReq(iTCPSocket, sLogDir, sLogFileName, sFileDir);
 				}
 				else
 				{
 
 				}
-				hGrandChild = m_wndClassView.GetNextItem(hGrandChild, TVGN_NEXT);
-			}
+				
+				//리스트의 다음 항목을 hGrandChild_Next에 저장함
+				hGrandChild_Next = m_wndClassView.GetNextItem(hGrandChild, TVGN_NEXT);
+				
+				//다운로드한 항목의 부모노드를 hChild에 저장함
+				hChild = m_wndClassView.GetParentItem(hGrandChild);
+				
+				//Agent에 존재하지 않거나 에러가 발생한 항목인경우
+				if(bErrorFlag)
+				{
+					//해당 학목 삭제
+					m_wndClassView.DeleteItem(hGrandChild);
+					AfxMessageBox("유효하지 않은 파일입니다.\n목록에서 삭제");
+					//트리뷰 출력을 업데이트
+					m_wndClassView.Invalidate();
+					m_wndClassView.UpdateWindow();
+					m_wndClassView.Expand(hChild, TVE_EXPAND);
+				}
 
+				//다음 항목을 다운로드하기 위해
+				//다운로드가 끝난 항목을 hGrandChild에 입력하여 진행
+				hGrandChild = hGrandChild_Next;
+
+			}
 		}
 	}
 	return 0;
@@ -862,8 +910,16 @@ UINT CClassView::Thread_RcsReq_Click(LPVOID pParam)
 	int iTCPSocket = 0;
 
 	string sItem = "";
+
+	//Agent IP저장되는 변수
+	string sAgentIP = "";
+	//Agent 이름 저장되는 변수
+	string sAgentName ="";
+	//Agent HDD사용량 저장 변수
 	char cHDDUSage[4096];
+	//Agent CPU 사용량 저장 변수
 	float fCPUUsage;
+	//Agent RAM 사용량 저장 변수
 	DWORD dwRAMUsage;
 
 	TV_HITTESTINFO hit_info;
@@ -882,7 +938,7 @@ UINT CClassView::Thread_RcsReq_Click(LPVOID pParam)
 	list<string> LogList;
 
 	int iIndex = 0;
-	string sAgentIP = "";
+
 	string sPItem = "";
 	BOOL bCnctFlag;
 	if(current_item != NULL)
@@ -897,6 +953,7 @@ UINT CClassView::Thread_RcsReq_Click(LPVOID pParam)
 		{
 			iIndex = sItem.find_first_of("/");
 			sAgentIP = sItem.substr(0, iIndex);
+			sAgentName = sItem.substr(iIndex+1, strlen(sItem.c_str()));
 			char* pcAgtIP = &sAgentIP[0u];
 
 			mTCPCommunication.TCPSockInit(iTCPSocket);
@@ -960,7 +1017,7 @@ HRESULT CClassView::Treeview_Refresh(WPARAM wParam, LPARAM lParam)
 		getline(strmFileList, sFileList,'\n');
 		m_wndClassView.InsertItem(_T(sFileList.c_str()), 1, 1, hChildItem);
 	}
-
+	m_wndClassView.Expand(hChildItem, TVE_EXPAND);
 	m_wndClassView.Invalidate();
 	m_wndClassView.UpdateWindow();
 
