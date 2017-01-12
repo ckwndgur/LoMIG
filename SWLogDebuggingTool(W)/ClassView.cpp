@@ -909,6 +909,7 @@ UINT CClassView::Thread_RcsReq_Click(LPVOID pParam)
 {
 	TCPCommunication mTCPCommunication;
 	int iTCPSocket = 0;
+	list<CString> listpv;
 
 	string sItem = "";
 

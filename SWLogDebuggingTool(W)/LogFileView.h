@@ -14,16 +14,16 @@ protected:
 	virtual ~LogFileView();
 
 public:
-//	Filter mFilter;
-// 	CWnd m_EditSearch;
-// 	CWnd m_ButtonSearch;
-// 	CComboBox m_ComboBox;
+	//	Filter mFilter;
+	// 	CWnd m_EditSearch;
+	// 	CWnd m_ButtonSearch;
+	// 	CComboBox m_ComboBox;
 
 	list<CString> m_strView;
-//	CString m_strViewPath;
+	//	CString m_strViewPath;
 	CSize m_textsize;
 
-//	list<CString> m_strFilteredData;
+	//	list<CString> m_strFilteredData;
 
 
 	BOOL m_bView;
@@ -31,7 +31,7 @@ public:
 	CString openfilepath;
 	BOOL m_openflag;
 	CListCtrl m_OriginLoglist;
-	
+
 
 private:
 	void SetScrollView(int x, int y);
@@ -43,7 +43,7 @@ public:
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 #endif
-	void LogtoList(CString filepath);
+	int LogtoList(CString filepath);
 	void DLogtoList(CString filepath);
 	void ListtoLog();
 

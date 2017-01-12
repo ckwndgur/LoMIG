@@ -3,9 +3,13 @@
 
 #include "stdafx.h"
 #include "SWLogDebuggingTool(W).h"
+#include "SWLogDebuggingTool(W)Doc.h"
 #include "DFilterView.h"
 #include "MainFrm.h"
-#include "SWLogDebuggingTool(W)Doc.h"
+#include "ChildFrm.h"
+#include "LogFileView.h"
+#include "LogFtView.h"
+
 #include "stdlib.h"
 #include "string.h"
 #include "FileView.h"
@@ -144,6 +148,21 @@ BOOL DFilterView::OnCommand(WPARAM wParam, LPARAM lParam)
 */
 		this->Invalidate(TRUE);
 
+		CSWLogDebuggingToolWApp *pApp = (CSWLogDebuggingToolWApp *)AfxGetApp();
+		CMainFrame* pFrame = (CMainFrame*)AfxGetMainWnd();
+		CChildFrame *pChild = (CChildFrame *) pFrame->GetActiveFrame();
+		LogFileView *pView = (LogFileView *)pChild->GetFileViewPane();
+		LogFtView *pFtView = (LogFtView *)pChild->GetFtViewPane();
+		DFilterView *pDView = (DFilterView *)pChild->GetDFilterViewPane();
+		pFtView->btn_flag = true;
+		pFtView->ExhibitPath = lastPath;
+		pFtView->Invalidate(TRUE);
+
+
+	}
+
+	else
+	{
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////여기까지
@@ -207,7 +226,7 @@ void DFilterView::PreFiltering(list<string> WantedLogString)
 				newpath = csfilepath;
 
 				m_strFilteredData.clear();
-				m_strFilteredData = mFilter.DoFilter(catenumberBuf, keywordBuf, Title, m_filePath, csfilepath, multiflag);
+				m_strFilteredData = mFilter.MultiFilter(catenumberBuf, keywordBuf, Title, m_filePath, csfilepath, multiflag);
 
 				multiflag  =  true;
 			}
@@ -230,7 +249,7 @@ void DFilterView::PreFiltering(list<string> WantedLogString)
 				mFolderManager.MakeDirectory((LPSTR)((LPCTSTR)csfilepath));
 
 				m_strFilteredData.clear();
-				m_strFilteredData = mFilter.DoFilter(catenumberBuf, keywordBuf, Title, newpath, csfilepath, multiflag);
+				m_strFilteredData = mFilter.MultiFilter(catenumberBuf, keywordBuf, Title, newpath, csfilepath, multiflag);
 
 				memcpy(oldpath, (LPSTR)(LPCSTR)newpath, newpath.GetLength());
 				remove(oldpath);
@@ -248,6 +267,9 @@ void DFilterView::PreFiltering(list<string> WantedLogString)
 		
 		}
 	}
+
+	mFilter.MultiResultPath = csfilepath;
+	lastPath = csfilepath;
 
 }
 

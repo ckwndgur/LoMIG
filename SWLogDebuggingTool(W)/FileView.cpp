@@ -241,31 +241,45 @@ void CFileView::OnProperties()
 
 void CFileView::OnFileOpen()
 {
-	CSWLogDebuggingToolWApp *pApp = (CSWLogDebuggingToolWApp *)AfxGetApp();
-	CSWLogDebuggingToolWDoc *pDoc = (CSWLogDebuggingToolWDoc *)pApp->pDocTemplate->OpenDocumentFile(csTVDataFilePath);
-	CMainFrame* pFrame = (CMainFrame*)AfxGetMainWnd();
-	CChildFrame *pChild = (CChildFrame *) pFrame->GetActiveFrame();
-	LogFileView *pView = (LogFileView *)pChild->GetFileViewPane();
-	LogFtView *pFtView = (LogFtView *)pChild->GetFtViewPane();
-	DFilterView *pDView = (DFilterView *)pChild->GetDFilterViewPane();
-	//DFilterView *pDView = new DFilterView;
-	
+	ifstream originfile;
+	originfile.open(csTVDataFilePath);
 
-	if (csTVDataFilePath.GetLength() >0 )
+	if (!originfile.fail())
 	{
-		pView->m_strView = mTextManager.ReadTextList((LPSTR)(LPCTSTR)csTVDataFilePath);
-		pView->m_bView = TRUE;
-		pView->m_textsize = Cal_scrollview(csTVDataFilePath);
+		CSWLogDebuggingToolWApp *pApp = (CSWLogDebuggingToolWApp *)AfxGetApp();
+		CSWLogDebuggingToolWDoc *pDoc = (CSWLogDebuggingToolWDoc *)pApp->pDocTemplate->OpenDocumentFile(csTVDataFilePath);
+		CMainFrame* pFrame = (CMainFrame*)AfxGetMainWnd();
+		CChildFrame *pChild = (CChildFrame *) pFrame->GetActiveFrame();
+		LogFileView *pView = (LogFileView *)pChild->GetFileViewPane();
+		LogFtView *pFtView = (LogFtView *)pChild->GetFtViewPane();
+		DFilterView *pDView = (DFilterView *)pChild->GetDFilterViewPane();
 
-		pView->m_openflag = TRUE;
-		pView->openfilepath = csTVDataFilePath;
-		pFtView->m_strViewPath = csTVDataFilePath;
-		pDView->m_filePath = csTVDataFilePath;
-		pFtView->m_textsize = Cal_scrollview(csTVDataFilePath);
-		
-		pView->Invalidate(TRUE);
-		
-	} 
+
+		if (csTVDataFilePath.GetLength() >0 )
+		{
+			pView->m_strView = mTextManager.ReadTextList((LPSTR)(LPCTSTR)csTVDataFilePath);
+			pView->m_bView = TRUE;
+			pView->m_textsize = Cal_scrollview(csTVDataFilePath);
+
+			pView->m_openflag = TRUE;
+			pView->openfilepath = csTVDataFilePath;
+			pFtView->m_strViewPath = csTVDataFilePath;
+			pDView->m_filePath = csTVDataFilePath;
+			pFtView->m_textsize = Cal_scrollview(csTVDataFilePath);
+
+			pView->Invalidate(TRUE);
+
+		}
+		else
+		{
+			AfxMessageBox(TEXT("파일열기에 실패했습니다."));
+		}
+	}
+
+	else
+	{
+		AfxMessageBox(TEXT("파일열기에 실패했습니다."));
+	}
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 }
 
