@@ -19,6 +19,7 @@
 
 #define IDC_MY_TREE_VIEW 2
 #define WM_TREEVIEW_REFRESH_EVENT WM_USER + 1
+#define WM_TREEVIEW_PVIEW_EVENT WM_USER + 2
 
 class CClassToolBar : public CMFCToolBar
 {
@@ -96,7 +97,7 @@ public:
 	afx_msg HRESULT Treeview_Refresh(WPARAM wParam, LPARAM lParam);
 
 	//below function is made by JH
-	void MessageToPV();
+	afx_msg HRESULT MessageToPV(WPARAM wParam, LPARAM lParam);
 
 private:
 	TreeviewManager m_TreeviewManager;

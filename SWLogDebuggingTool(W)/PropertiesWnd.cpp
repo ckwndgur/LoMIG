@@ -1,6 +1,6 @@
 
-#include "stdafx.h"
 
+#include "stdafx.h"
 #include "PropertiesWnd.h"
 #include "Resource.h"
 #include "MainFrm.h"
@@ -36,6 +36,7 @@ BEGIN_MESSAGE_MAP(CPropertiesWnd, CDockablePane)
 	ON_UPDATE_COMMAND_UI(ID_PROPERTIES2, OnUpdateProperties2)
 	ON_WM_SETFOCUS()
 	ON_WM_SETTINGCHANGE()
+	ON_WM_PAINT()
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -161,27 +162,9 @@ void CPropertiesWnd::InitPropList()
 	m_wndPropList.SetVSDotNetLook();
 	m_wndPropList.MarkModifiedProperties();
 
-	CMFCPropertyGridProperty* pGroup1 = new CMFCPropertyGridProperty(_T("Agent"));
-	CMFCPropertyGridProperty* pAgentProp1 = new CMFCPropertyGridProperty(_T("Name"), (_variant_t) _T(""), _T("Agent의 Name입니다."));
-	CMFCPropertyGridProperty* pAgentProp2 = new CMFCPropertyGridProperty(_T("IP"), (_variant_t) _T(""), _T("Agent의 IP입니다."));
-	CMFCPropertyGridProperty* pAgentProp3 = new CMFCPropertyGridProperty(_T("CPU"), (_variant_t) _T(""), _T("Agent의 CPU 사용량입니다."));
-	CMFCPropertyGridProperty* pAgentProp4 = new CMFCPropertyGridProperty(_T("MEM"), (_variant_t) _T(""), _T("Agent의 Memory 사용량입니다."));
-	CMFCPropertyGridProperty* pAgentProp5 = new CMFCPropertyGridProperty(_T("DISK"), (_variant_t) _T(""), _T("Agent의 Disk 사용량입니다."));
-	pGroup1->AddSubItem(pAgentProp1);
-	pGroup1->AddSubItem(pAgentProp2);
-	pGroup1->AddSubItem(pAgentProp3);
-	pGroup1->AddSubItem(pAgentProp4);
-	pGroup1->AddSubItem(pAgentProp5);
-	m_wndPropList.AddProperty(pGroup1);
-
-	CMFCPropertyGridProperty* pGroup2 = new CMFCPropertyGridProperty(_T("Log File"));
-	CMFCPropertyGridProperty* pLogProp1 = new CMFCPropertyGridProperty(_T("Name"), (_variant_t) _T(""), _T("Log File의 이름입니다."));
-	CMFCPropertyGridProperty* pLogProp2 = new CMFCPropertyGridProperty(_T("Path"), (_variant_t) _T(""), _T("Log File의 경로입니다."));
-	CMFCPropertyGridProperty* pLogProp3 = new CMFCPropertyGridProperty(_T("Size"), (_variant_t) _T(""), _T("Log File의 크기입니다."));
-	pGroup2->AddSubItem(pLogProp1);
-	pGroup2->AddSubItem(pLogProp2);
-	pGroup2->AddSubItem(pLogProp3);
-	m_wndPropList.AddProperty(pGroup2);
+	//SetAgentP(false);
+	//SetWatcherP(false);
+	
 
 /*
 	CMFCPropertyGridProperty* pGroup1 = new CMFCPropertyGridProperty(_T("모양"));
@@ -291,4 +274,107 @@ void CPropertiesWnd::SetPropListFont()
 	m_fntPropList.CreateFontIndirect(&lf);
 
 	m_wndPropList.SetFont(&m_fntPropList);
+}
+
+
+
+void CPropertiesWnd::OnPaint()
+{
+	CPaintDC dc(this); // device context for painting
+	// TODO: Add your message handler code here
+	// Do not call CDockablePane::OnPaint() for painting messages
+	if ((bAgentInfo == false) && (bWatcherInfo == false))
+	{
+		RefreshAW();
+	}
+	if (bAgentInfo)
+	{
+		SetAgentP();
+	} 
+	if (bWatcherInfo)
+	{
+		SetWatcherP();
+	}
+	
+}
+
+void CPropertiesWnd::SetAgentP()
+{
+	m_wndPropList.DeleteProperty(pGroup1);
+	pGroup1 = new CMFCPropertyGridProperty(_T("Agent"));
+	pAgentProp1 = new CMFCPropertyGridProperty(_T("Name"), (_variant_t) csAgentName, _T("Agent의 Name입니다."));
+	pAgentProp2 = new CMFCPropertyGridProperty(_T("IP"), (_variant_t) csAgentIP, _T("Agent의 IP입니다."));
+	pAgentProp3 = new CMFCPropertyGridProperty(_T("CPU"), (_variant_t) csAgentCPU, _T("Agent의 CPU 사용량입니다."));
+	pAgentProp4 = new CMFCPropertyGridProperty(_T("MEM"), (_variant_t) csAgentMEM, _T("Agent의 Memory 사용량입니다."));
+	pAgentProp5 = new CMFCPropertyGridProperty(_T("DISK"), (_variant_t) csAgentDISK, _T("Agent의 Disk 사용량입니다."));
+	pGroup1->AddSubItem(pAgentProp1);
+	pGroup1->AddSubItem(pAgentProp2);
+	pGroup1->AddSubItem(pAgentProp3);
+	pGroup1->AddSubItem(pAgentProp4);
+	pGroup1->AddSubItem(pAgentProp5);
+	m_wndPropList.AddProperty(pGroup1);
+
+	m_wndPropList.DeleteProperty(pGroup2);
+	pGroup2 = new CMFCPropertyGridProperty(_T("Watcher Log File"));
+	pLogProp1 = new CMFCPropertyGridProperty(_T("Name"), (_variant_t) _T(""), _T("Log File의 이름입니다."));
+	pLogProp2 = new CMFCPropertyGridProperty(_T("Path"), (_variant_t) _T(""), _T("Log File의 경로입니다."));
+	pLogProp3 = new CMFCPropertyGridProperty(_T("Size"), (_variant_t) _T(""), _T("Log File의 크기입니다."));
+	pGroup2->AddSubItem(pLogProp1);
+	pGroup2->AddSubItem(pLogProp2);
+	pGroup2->AddSubItem(pLogProp3);
+	m_wndPropList.AddProperty(pGroup2);
+}
+
+void CPropertiesWnd::SetWatcherP()
+{
+	m_wndPropList.DeleteProperty(pGroup1);
+	pGroup1 = new CMFCPropertyGridProperty(_T("Agent"));
+	pAgentProp1 = new CMFCPropertyGridProperty(_T("Name"), (_variant_t) _T(""), _T("Agent의 Name입니다."));
+	pAgentProp2 = new CMFCPropertyGridProperty(_T("IP"), (_variant_t) _T(""), _T("Agent의 IP입니다."));
+	pAgentProp3 = new CMFCPropertyGridProperty(_T("CPU"), (_variant_t) _T(""), _T("Agent의 CPU 사용량입니다."));
+	pAgentProp4 = new CMFCPropertyGridProperty(_T("MEM"), (_variant_t) _T(""), _T("Agent의 Memory 사용량입니다."));
+	pAgentProp5 = new CMFCPropertyGridProperty(_T("DISK"), (_variant_t) _T(""), _T("Agent의 Disk 사용량입니다."));
+	pGroup1->AddSubItem(pAgentProp1);
+	pGroup1->AddSubItem(pAgentProp2);
+	pGroup1->AddSubItem(pAgentProp3);
+	pGroup1->AddSubItem(pAgentProp4);
+	pGroup1->AddSubItem(pAgentProp5);
+	m_wndPropList.AddProperty(pGroup1);
+
+	m_wndPropList.DeleteProperty(pGroup2);
+	pGroup2 = new CMFCPropertyGridProperty(_T("Watcher Log File"));
+	pLogProp1 = new CMFCPropertyGridProperty(_T("Name"), (_variant_t) csWatcherFileName, _T("Log File의 이름입니다."));
+	pLogProp2 = new CMFCPropertyGridProperty(_T("Path"), (_variant_t) csWatcherFileDirectory, _T("Log File의 경로입니다."));
+	pLogProp3 = new CMFCPropertyGridProperty(_T("Size"), (_variant_t) csWatcherFileSize, _T("Log File의 크기입니다."));
+	pGroup2->AddSubItem(pLogProp1);
+	pGroup2->AddSubItem(pLogProp2);
+	pGroup2->AddSubItem(pLogProp3);
+	m_wndPropList.AddProperty(pGroup2);
+}
+
+void CPropertiesWnd::RefreshAW()
+{
+	m_wndPropList.DeleteProperty(pGroup1);
+	pGroup1 = new CMFCPropertyGridProperty(_T("Agent"));
+	pAgentProp1 = new CMFCPropertyGridProperty(_T("Name"), (_variant_t) _T(""), _T("Agent의 Name입니다."));
+	pAgentProp2 = new CMFCPropertyGridProperty(_T("IP"), (_variant_t) _T(""), _T("Agent의 IP입니다."));
+	pAgentProp3 = new CMFCPropertyGridProperty(_T("CPU"), (_variant_t) _T(""), _T("Agent의 CPU 사용량입니다."));
+	pAgentProp4 = new CMFCPropertyGridProperty(_T("MEM"), (_variant_t) _T(""), _T("Agent의 Memory 사용량입니다."));
+	pAgentProp5 = new CMFCPropertyGridProperty(_T("DISK"), (_variant_t) _T(""), _T("Agent의 Disk 사용량입니다."));
+	pGroup1->AddSubItem(pAgentProp1);
+	pGroup1->AddSubItem(pAgentProp2);
+	pGroup1->AddSubItem(pAgentProp3);
+	pGroup1->AddSubItem(pAgentProp4);
+	pGroup1->AddSubItem(pAgentProp5);
+	m_wndPropList.AddProperty(pGroup1);
+
+	m_wndPropList.DeleteProperty(pGroup2);
+	pGroup2 = new CMFCPropertyGridProperty(_T("Watcher Log File"));
+	pLogProp1 = new CMFCPropertyGridProperty(_T("Name"), (_variant_t) _T(""), _T("Log File의 이름입니다."));
+	pLogProp2 = new CMFCPropertyGridProperty(_T("Path"), (_variant_t) _T(""), _T("Log File의 경로입니다."));
+	pLogProp3 = new CMFCPropertyGridProperty(_T("Size"), (_variant_t) _T(""), _T("Log File의 크기입니다."));
+	pGroup2->AddSubItem(pLogProp1);
+	pGroup2->AddSubItem(pLogProp2);
+	pGroup2->AddSubItem(pLogProp3);
+	m_wndPropList.AddProperty(pGroup2);
 }

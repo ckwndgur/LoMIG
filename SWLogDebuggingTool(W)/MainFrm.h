@@ -42,11 +42,11 @@ protected:  // 컨트롤 모음이 포함된 멤버입니다.
 	CFileView         m_wndFileView;
 	CClassView        m_wndClassView;
 	COutputWnd        m_wndOutput;
-	
+	CPropertiesWnd    m_wndProperties;
 	CFilterWnd		  m_wndFilter;
 	
 public:
-	CPropertiesWnd    m_wndProperties;
+	CDockablePane* GetPropertyViewPT();
 
 
 // 생성된 메시지 맵 함수

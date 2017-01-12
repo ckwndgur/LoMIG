@@ -1,5 +1,8 @@
 
 #pragma once
+#include <string>
+#include "stdafx.h"
+#include "afxcmn.h"
 
 class CPropertiesToolBar : public CMFCToolBar
 {
@@ -38,6 +41,35 @@ protected:
 public:
 	virtual ~CPropertiesWnd();
 
+public:
+	bool bAgentInfo;
+	CString csAgentName;
+	CString csAgentIP;
+	CString csAgentCPU;
+	CString csAgentMEM;
+	CString csAgentDISK;
+
+	bool bWatcherInfo;
+	CString csWatcherFileName;
+	CString csWatcherFileDirectory;
+	CString csWatcherFileSize;
+
+private:
+	CMFCPropertyGridProperty* pGroup1 ;
+	CMFCPropertyGridProperty* pAgentProp1;
+	CMFCPropertyGridProperty* pAgentProp2;
+	CMFCPropertyGridProperty* pAgentProp3;
+	CMFCPropertyGridProperty* pAgentProp4;
+	CMFCPropertyGridProperty* pAgentProp5;
+	CMFCPropertyGridProperty* pGroup2;
+	CMFCPropertyGridProperty* pLogProp1;
+	CMFCPropertyGridProperty* pLogProp2;
+	CMFCPropertyGridProperty* pLogProp3;
+
+	void SetAgentP();
+	void SetWatcherP();
+	void RefreshAW();
+
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
@@ -56,5 +88,9 @@ protected:
 
 	void InitPropList();
 	void SetPropListFont();
+
+public:
+	afx_msg void OnPaint();
+	
 };
 
