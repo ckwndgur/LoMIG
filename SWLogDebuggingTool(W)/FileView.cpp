@@ -11,6 +11,7 @@
 #include "LogFileView.h"
 #include "LogFtView.h"
 #include "DFilterView.h"
+#include "PropertiesWnd.h"
 
 
 #ifdef _DEBUG
@@ -161,7 +162,7 @@ void CFileView::MakeTreeview(CString pstr) // Folder searching and make tree vie
 
 void CFileView::FillFileView()
 {
-	hRoot = m_wndFileView.InsertItem(_T("LoggDebugging"), 0, 0);
+	hRoot = m_wndFileView.InsertItem(_T("LogDebugging"), 0, 0);
 	
 	m_wndFileView.SetItemState(hRoot, TVIS_BOLD, TVIS_BOLD);
  
@@ -240,31 +241,45 @@ void CFileView::OnProperties()
 
 void CFileView::OnFileOpen()
 {
-	CSWLogDebuggingToolWApp *pApp = (CSWLogDebuggingToolWApp *)AfxGetApp();
-	CSWLogDebuggingToolWDoc *pDoc = (CSWLogDebuggingToolWDoc *)pApp->pDocTemplate->OpenDocumentFile(csTVDataFilePath);
-	CMainFrame* pFrame = (CMainFrame*)AfxGetMainWnd();
-	CChildFrame *pChild = (CChildFrame *) pFrame->GetActiveFrame();
-	LogFileView *pView = (LogFileView *)pChild->GetFileViewPane();
-	LogFtView *pFtView = (LogFtView *)pChild->GetFtViewPane();
-	DFilterView *pDView = (DFilterView *)pChild->GetDFilterViewPane();
-	//DFilterView *pDView = new DFilterView;
-	
+	ifstream originfile;
+	originfile.open(csTVDataFilePath);
 
-	if (csTVDataFilePath.GetLength() >0 )
+	if (!originfile.fail())
 	{
-		pView->m_strView = mTextManager.ReadTextList((LPSTR)(LPCTSTR)csTVDataFilePath);
-		pView->m_bView = TRUE;
-		pView->m_textsize = Cal_scrollview(csTVDataFilePath);
+		CSWLogDebuggingToolWApp *pApp = (CSWLogDebuggingToolWApp *)AfxGetApp();
+		CSWLogDebuggingToolWDoc *pDoc = (CSWLogDebuggingToolWDoc *)pApp->pDocTemplate->OpenDocumentFile(csTVDataFilePath);
+		CMainFrame* pFrame = (CMainFrame*)AfxGetMainWnd();
+		CChildFrame *pChild = (CChildFrame *) pFrame->GetActiveFrame();
+		LogFileView *pView = (LogFileView *)pChild->GetFileViewPane();
+		LogFtView *pFtView = (LogFtView *)pChild->GetFtViewPane();
+		DFilterView *pDView = (DFilterView *)pChild->GetDFilterViewPane();
 
-		pView->m_openflag = TRUE;
-		pView->openfilepath = csTVDataFilePath;
-		pFtView->m_strViewPath = csTVDataFilePath;
-		pDView->m_filePath = csTVDataFilePath;
-		pFtView->m_textsize = Cal_scrollview(csTVDataFilePath);
-		
-		pView->Invalidate(TRUE);
-		
-	} 
+
+		if (csTVDataFilePath.GetLength() >0 )
+		{
+			pView->m_strView = mTextManager.ReadTextList((LPSTR)(LPCTSTR)csTVDataFilePath);
+			pView->m_bView = TRUE;
+			pView->m_textsize = Cal_scrollview(csTVDataFilePath);
+
+			pView->m_openflag = TRUE;
+			pView->openfilepath = csTVDataFilePath;
+			pFtView->m_strViewPath = csTVDataFilePath;
+			pDView->m_filePath = csTVDataFilePath;
+			pFtView->m_textsize = Cal_scrollview(csTVDataFilePath);
+
+			pView->Invalidate(TRUE);
+
+		}
+		else
+		{
+			AfxMessageBox(TEXT("파일열기에 실패했습니다."));
+		}
+	}
+
+	else
+	{
+		AfxMessageBox(TEXT("파일열기에 실패했습니다."));
+	}
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 }
 
@@ -367,18 +382,91 @@ void CFileView::OnChangeVisualStyle()
 
 void CFileView::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	CTreeCtrl* pWndTree = (CTreeCtrl*) &m_wndFileView;
-
-	if (point != CPoint(-1, -1))
-	{
-		// 클릭한 항목을 선택합니다.
-		CPoint ptTree = point;
-		pWndTree->ScreenToClient(&ptTree);
-
-		UINT flags = 0;
-		HTREEITEM hTreeItem = pWndTree->HitTest(ptTree, &flags);
-		csTVDataFileName = pWndTree->GetItemText(hTreeItem);
-	}
 	
 	CWnd::OnLButtonDown(nFlags, point);
+}
+BOOL CFileView::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: Add your specialized code here and/or call the base class
+	switch(pMsg->message)
+	{
+	case WM_LBUTTONDOWN :
+		CMainFrame* pFrame = (CMainFrame*)AfxGetMainWnd();
+		CPropertiesWnd *pProWnd = (CPropertiesWnd*)pFrame->GetPropertyViewPT();
+
+		TV_HITTESTINFO hit_info;
+		::GetCursorPos(&hit_info.pt);
+		::ScreenToClient(m_wndFileView.m_hWnd, &hit_info.pt);
+		HTREEITEM init_item = m_wndFileView.HitTest(&hit_info);
+		HTREEITEM current_item = init_item;
+		HTREEITEM selected_DateItem;
+		HTREEITEM selected_IPItem;
+		HTREEITEM selected_DefaultItem;
+
+		CString csSelectedFileName;
+		CString csSelectedIP;
+		CString csSelectedDate;
+		CString csSelectedDefault;
+		CString csSelectedDirectory;
+
+		if(current_item != NULL)
+		{
+			m_wndFileView.Select(current_item, TVGN_CARET);
+			
+// 			while(m_wndFileView.GetChildItem(current_item) != NULL)
+// 			{
+// 				current_item = m_wndFileView.GetChildItem(current_item);
+// 			}
+			
+			int cnt = 0;
+			while(m_wndFileView.GetParentItem(current_item) != NULL)
+			{
+				current_item = m_wndFileView.GetParentItem(current_item);
+				cnt++;
+			}
+			
+			if (cnt == 3)
+			{
+				csSelectedFileName = m_wndFileView.GetItemText(init_item);
+				selected_IPItem = m_wndFileView.GetParentItem(init_item);
+				csSelectedIP = m_wndFileView.GetItemText(selected_IPItem);
+				selected_DateItem = m_wndFileView.GetParentItem(selected_IPItem);
+				csSelectedDate = m_wndFileView.GetItemText(selected_DateItem);
+				selected_DefaultItem = m_wndFileView.GetParentItem(selected_DateItem);
+				csSelectedDefault = m_wndFileView.GetItemText(selected_DefaultItem);
+				
+				csSelectedDirectory = "C:\\" + csSelectedDefault + "\\" + csSelectedDate + "\\" + csSelectedIP + "\\" + csSelectedFileName;
+
+				pProWnd->csWatcherFileName = csSelectedFileName;
+				pProWnd->csWatcherFileDirectory = csSelectedDirectory;
+				pProWnd->bWatcherInfo = true;
+				CString csbuf = "C:\\" + csSelectedDefault + "\\" + csSelectedDate + "\\" + csSelectedIP + "\\";
+				
+				HANDLE hFile;
+				csSelectedDirectory += ".txt";
+				hFile = ::CreateFile(csSelectedDirectory, 0, 0, NULL, OPEN_EXISTING, 0, NULL);
+				UINT ifilesize = GetFileSize(hFile, NULL);
+				//ifilesize = mTextManager.GetFileSize((LPSTR)(LPCTSTR)csbuf, (LPSTR)(LPCTSTR)csSelectedFileName);
+				CString csfilesize = "";
+				csfilesize.Format(_T("%d"), ifilesize);
+				pProWnd->csWatcherFileSize = csfilesize;
+				
+				CloseHandle(hFile);
+
+				pProWnd->Invalidate(FALSE);
+			} 
+			else
+			{
+				pProWnd->csWatcherFileDirectory = "";
+				pProWnd->csWatcherFileName = "";
+				pProWnd->csWatcherFileSize = "";
+
+				pProWnd->Invalidate(FALSE);
+			}
+
+		}
+		break;
+	}
+
+	return CDockablePane::PreTranslateMessage(pMsg);
 }

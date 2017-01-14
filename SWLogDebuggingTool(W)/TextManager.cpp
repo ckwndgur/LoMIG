@@ -175,17 +175,17 @@ int TextManager::GetFileSize(char* filedirectory, char* filename){
 
 	if((fpMe = fopen(mStringManager.AppendChar(filedirectory, filename),"rb")) == NULL)
 	{
-		printf("");
+		//printf("");
 	}
 	else
 	{
-		printf("s");
+		//printf("s");
 	}
 
 	fseek(fpMe, 0L, SEEK_END);
 
 	len = ftell(fpMe);
-	printf("%d byte\n",len);
+	//printf("%d byte\n",len);
 	fclose(fpMe);
 
 	return (int)len;

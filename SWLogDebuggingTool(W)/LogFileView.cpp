@@ -134,6 +134,7 @@ void LogFileView::OnDraw(CDC* pDC)
 
 	if(m_openflag == TRUE)
 	{
+
 		LogtoList(openfilepath);
 		//DLogtoList(openfilepath);
 	}
@@ -285,6 +286,9 @@ void LogFileView::DLogtoList(CString filepath)
 }
 
 
+
+
+
 //로그형태
 /*
 (TEST)
@@ -293,9 +297,24 @@ _c:\stc_dds\include\csds\csds.h_
 734_
 [ RTDBDomain ] TRACKDB_ALL_E on_sample_lost and total count =7
 */
-void LogFileView::LogtoList(CString filepath)
+int LogFileView::LogtoList(CString filepath)
 {
-	ifstream originfile(filepath); //지정된 경로의 로그파일을 열어 저장합니다.
+	ifstream originfile;
+	originfile.open(filepath);
+
+
+	/*
+	originfile.open(filepath, 1);
+
+	if (!originfile)
+	{
+		AfxMessageBox(TEXT("파일열기에 실패했습니다."));
+		return 0;
+	}
+	else
+	{
+	}
+*/
 	string alinelog;
 	alinelog = "";
 	CString lineno;
@@ -312,6 +331,8 @@ void LogFileView::LogtoList(CString filepath)
 	m_OriginLoglist.InsertColumn(3, "PATH",  LVCFMT_LEFT, 200);
 	m_OriginLoglist.InsertColumn(4, "LINE",  LVCFMT_LEFT, 50);
 	m_OriginLoglist.InsertColumn(5, "DESCRIPTION",  LVCFMT_LEFT, 250);
+
+
 
 	while(!originfile.eof())
 	{
@@ -446,6 +467,7 @@ void LogFileView::LogtoList(CString filepath)
 	}
 
 	listno = 0;
+	return 0;
 }
 
 //리스트뷰의 아이템을 받아옵니다.

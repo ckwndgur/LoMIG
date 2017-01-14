@@ -261,6 +261,12 @@ BOOL CMainFrame::CreateDockingWindows()
 	return TRUE;
 }
 
+CDockablePane* CMainFrame::GetPropertyViewPT()
+{
+	CWnd* pWnd = (CWnd *)&m_wndProperties;
+	return (CDockablePane *)pWnd;
+}
+
 void CMainFrame::SetDockingWindowIcons(BOOL bHiColorIcons)
 {
 	HICON hFileViewIcon = (HICON) ::LoadImage(::AfxGetResourceHandle(), MAKEINTRESOURCE(bHiColorIcons ? IDI_FILE_VIEW_HC : IDI_FILE_VIEW), IMAGE_ICON, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), 0);

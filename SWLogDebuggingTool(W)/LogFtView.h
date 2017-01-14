@@ -25,6 +25,8 @@ public:
 	CSize m_textsize;
 	CListCtrl m_list;
 	//var
+	bool btn_flag;
+	CString ExhibitPath;
 
 	//func
 private:
@@ -44,6 +46,7 @@ private:
 	//func
 
 public:
+	void ResultExhbView(CString resultpath);
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 #ifndef _WIN32_WCE
@@ -60,3 +63,5 @@ protected:
 public:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 };
+
+

@@ -19,6 +19,7 @@ public:
 
 
 	CString m_filePath;
+	CString lastPath;
 
 	Filter mFilter;
 
@@ -63,3 +64,5 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 };
+
+

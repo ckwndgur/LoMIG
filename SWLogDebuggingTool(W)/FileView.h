@@ -87,5 +87,6 @@ private:
 	
 public:
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
 

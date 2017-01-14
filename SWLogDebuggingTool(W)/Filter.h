@@ -15,13 +15,15 @@ public:
 	Filter();
 	~Filter();
 	list<CString> DoFilter(int Category,string WantedLog,string Title, CString filepath, CString Rfilepath, bool multiflag);
-	list<CString> MultiFilter(list<string> keywords, string Title, CString originpath, CString newpath, bool multifalg);
+	list<CString> MultiFilter(int cate, string keyword, string Title, CString originpath, CString newpath, bool multifalg);
+	//list<CString> MultiFilter(list<string> keywords, string Title, CString originpath, CString newpath, bool multifalg);
 	string LogDivider(int category, string alinelog);
 	string CreatingTime(string WantedLog);
 
 	string WantedLog;
 	CString LogColumn;
 	CString ResultPath;
+	CString MultiResultPath;
 
 
 	list<CString> cslstFilteredData;
