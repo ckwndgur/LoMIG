@@ -87,7 +87,9 @@ int CClassView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	//통신 기능 초기화 - 소켓 생성 및 멀티캐스트 그룹주소 설정 등
 	mUDPCommunication.WSAInit();
-	mUDPCommunication.InitSocket_Wt(iUdpMultiSock, iUdpUniSock, iUdpSndSock);
+	mUDPCommunication.InitSocket_Wt(iUdpMultiSock);
+	mUDPCommunication.InitSocket_Wt(iUdpUniSock);
+	mUDPCommunication.InitSocket_Wt(iUdpSndSock);
 	
 	mXMLManager.initXML();
 
@@ -740,7 +742,7 @@ UINT CClassView::Thread_Log_Req(LPVOID pParam)
 	string sAgentIPwithName = "";
 	string sAgentIP = "";
 	string sFileDir = "";
-	std::string sFileList = "";
+	string sFileList = "";
 
 	stringstream sDate;
 	BOOL bErrorFlag = FALSE;
@@ -893,13 +895,15 @@ UINT CClassView::Thread_Info_Rcv(LPVOID pParam)
 	int iUdpUniSock = 0;
 	SOCKADDR_IN AddrStruct;
 
+	mUDPCommunication.InitSocket_Wt(iUdpUniSock);
+
 	memset(&AddrStruct, 0, sizeof(AddrStruct));
 	AddrStruct.sin_family = AF_INET;
 	AddrStruct.sin_addr.s_addr = htonl(INADDR_ANY);
 	AddrStruct.sin_port = htons(MY_UDP_PORT);
 	bind(iUdpUniSock, (SOCKADDR*)&AddrStruct, sizeof(AddrStruct));
 
-	mUDPCommunication.RcvInfor(iUdpUniSock, 4);
+	mUDPCommunication.RcvInfor(iUdpUniSock, 2);
 
 	return 0;
 }
