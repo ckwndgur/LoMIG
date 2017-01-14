@@ -202,8 +202,35 @@ void DFilterView::PreFiltering(list<string> WantedLogString)
 			catenumber.push_back(catenumberBuf);
 			keywordBuf = WantedLogString.front();
 			keywords.push_back(keywordBuf);
-			TitleMana = TitleMana + "[" + WantedLogString.front() + "]";
-			WantedLogString.pop_front();
+			if (catenumberBuf == 6)
+			{
+				if (keywordBuf.find("|"))
+				{				
+					string strdevider, strbuf;
+					strdevider = strbuf = "";
+					int strcnt = 0;
+					strbuf =  keywordBuf;
+					strcnt = strbuf.find("|");
+					strdevider = strbuf.substr(0,strcnt);
+					strbuf.erase(0,strcnt + 1);
+					strdevider = strdevider + "(or)" + strbuf;
+
+					//TitleMana = TitleMana + "[" + WantedLogString.front() + "]";
+					TitleMana = TitleMana  + "[" + strdevider + "]";
+					WantedLogString.pop_front();
+				}
+				else
+				{
+					TitleMana = TitleMana + "[" + WantedLogString.front() + "]";
+					WantedLogString.pop_front();
+				}
+			}
+			else
+			{
+				TitleMana = TitleMana + "[" + WantedLogString.front() + "]";
+				WantedLogString.pop_front();
+			}
+			
 
 			string Title= mFilter.CreatingTime(TitleMana);
 
