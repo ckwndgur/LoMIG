@@ -34,11 +34,11 @@ public:
 
 	int recvfromTimeOut(SOCKET socket, long sec, long usec);
 	void WSAInit();
-	void InitSocket_Wt(int& hRecvSock, int& hRecvUniSock, int& hSndSock);
-	void MultiGroupRcvSet(int iRcvSocket, char* MultiGroupAddr, int MultiGroupPort);
-	void InforReq(int iSndSock, int iWatcherPort, char* cMultiGroup);
-	list<string> RcvInfor(int iRcvUniSock, int iTimeout_sec);
-	list<string> RcvInfor_nonTimeout(int iRcvUniSock, int iTimeout_sec);
+	void InitSocket_Wt(int& hRecvSock);
+	void MultiGroupRcvSet(int& iRcvSocket, char* MultiGroupAddr, int MultiGroupPort);
+	void InforReq(int& iSndSock, int iWatcherPort, char* cMultiGroup);
+	list<string> RcvInfor(int& iRcvUniSock, int iTimeout_sec);
+	list<string> RcvInfor_nonTimeout(int& iRcvUniSock, int iTimeout_sec);
 
 	int GetDate();
 	int GetDate_DAY();

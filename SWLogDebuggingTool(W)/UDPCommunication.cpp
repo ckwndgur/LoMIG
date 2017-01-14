@@ -68,31 +68,15 @@ void UDPCommunication::WSAInit()
 	//	fputs("WSAStartup() error\n", stderr);
 }
 
-void UDPCommunication::InitSocket_Wt(int& hRecvSock, int& hRecvUniSock, int& hSndSock)
+void UDPCommunication::InitSocket_Wt(int& hUDPSock)
 {
 	//소켓생성
-	hRecvSock = socket(PF_INET, SOCK_DGRAM, 0);
-	if(hRecvSock == INVALID_SOCKET)
-		fputs("Rsocket() error\n", stderr);
-	// 	else
-	// 		printf("1st Socket Open Success\n");
-
-	hRecvUniSock = socket(PF_INET, SOCK_DGRAM, 0);
-	if(hRecvUniSock == INVALID_SOCKET)
-		fputs("hRecvUniSock() error\n", stderr);
-	// 	else
-	// 		printf("2nb Socket Open Success\n");
-
-	hSndSock = socket(PF_INET, SOCK_DGRAM, 0);
-	if(hSndSock == INVALID_SOCKET)
-		fputs("Ssocket() error\n", stderr);
-	// 	else
-	// 		printf("3rd Socket Open Success\n");
-
-	//hRecvSock, hSndSock, hRecvUniSock UDP소켓을 생성해줌
+	hUDPSock = socket(PF_INET, SOCK_DGRAM, 0);
+	if(hUDPSock == INVALID_SOCKET)
+		AfxMessageBox("Socket Init Failed");
 }
 
-void UDPCommunication::MultiGroupRcvSet(int iRcvSocket, char* MultiGroupAddr, int MultiGroupPort)
+void UDPCommunication::MultiGroupRcvSet(int& iRcvSocket, char* MultiGroupAddr, int MultiGroupPort)
 {
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
@@ -110,8 +94,7 @@ void UDPCommunication::MultiGroupRcvSet(int iRcvSocket, char* MultiGroupAddr, in
 		fputs("Rsetsockopt() error\n", stderr);
 }
 
-
-void UDPCommunication::InforReq(int iSndSock, int iWatcherPort, char* cMultiGroup)
+void UDPCommunication::InforReq(int& iSndSock, int iWatcherPort, char* cMultiGroup)
 {
 	struct DataReqMsgStruct MyDataReqMsg;
 	memset(&MyDataReqMsg, 0, sizeof(struct DataReqMsgStruct));
@@ -124,6 +107,7 @@ void UDPCommunication::InforReq(int iSndSock, int iWatcherPort, char* cMultiGrou
 		// ip address 파악
 		strcpy(cIPAddr, inet_ntoa(*(struct in_addr*)pHostInfo->h_addr_list[0]));
 	}
+
 	int ttl = 15;
 	int iyes = 1;
 	int state = setsockopt(iSndSock,IPPROTO_IP,IP_MULTICAST_TTL,(char*)&ttl,sizeof(ttl));
@@ -215,7 +199,7 @@ void UDPCommunication::LogFileRcv(int iRcvSocket, char* cFileDir, char* cFileNam
 }
 
 //현재 에이전트가 실행중인 노드의 IP/로그파일경로/경로에 존재하는 파일 목록 을 요청하기 위한 함수
-list<string> UDPCommunication::RcvInfor(int iRcvUniSock, int iTimeout_sec)
+list<string> UDPCommunication::RcvInfor(int& iRcvUniSock, int iTimeout_sec)
 {
 	char cRcvBuf[4096];
 	//char* cSingleFileName;
@@ -252,8 +236,8 @@ list<string> UDPCommunication::RcvInfor(int iRcvUniSock, int iTimeout_sec)
 			mXMLManager.EditElementXML("AgentInfo", "AgentIP", MyAgtInfoMsg.cAgtIPAddr);
 			mXMLManager.EditElementXML("AgentInfo", "AgentName", MyAgtInfoMsg.cAgtName);
 			//mXMLManager.EditElementXML("AgentInfo", "AgentLogDir", "CoreDebug"/*MyAgtInfoMsg.cAgtLogDir*/);
-			mXMLManager.EditElementXML("AgentInfo", "AgentLogFileList", MyAgtInfoMsg.cAgtFileList);
-			mXMLManager.EditElementXML("AgentInfo", "AgentLogDir", MyAgtInfoMsg.cAgtLogDir);
+			//mXMLManager.EditElementXML("AgentInfo", "AgentLogFileList", MyAgtInfoMsg.cAgtFileList);
+			mXMLManager.EditElementXML("AgentInfo", "AgentLogFileDirectory", MyAgtInfoMsg.cAgtLogDir);
 
 			MyAgtInfoMsg.cAgtFileList[strlen(MyAgtInfoMsg.cAgtFileList)-1] = '\0';
 
@@ -315,7 +299,7 @@ void UDPCommunication::RcvRsc(int iRcvUniSock, int iTimeout_sec)
 	}
 }
 
-list<string> UDPCommunication::RcvInfor_nonTimeout(int iRcvUniSock, int iTimeout_sec)
+list<string> UDPCommunication::RcvInfor_nonTimeout(int& iRcvUniSock, int iTimeout_sec)
 {
 	char cRcvBuf[4096];
 	char cRcvdIP[16];
