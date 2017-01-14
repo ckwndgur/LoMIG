@@ -904,7 +904,7 @@ UINT CClassView::Thread_Info_Rcv(LPVOID pParam)
 	AddrStruct.sin_port = htons(MY_UDP_PORT);
 	bind(iUdpUniSock, (SOCKADDR*)&AddrStruct, sizeof(AddrStruct));
 
-	mUDPCommunication.RcvInfor(iUdpUniSock, 2);
+	mUDPCommunication.RcvInfor(iUdpUniSock, 5);
 
 	return 0;
 }
