@@ -104,15 +104,79 @@ list<CString> Filter::MultiFilter(int cate, string keyword, string Title, CStrin
 					devidedlog = LogDivider(category, buflog);
 				}
 
-				//키워드가 해당 로그에 존재하는지 검사합니다.
-				if (devidedlog.find(keywordBuf) != -1)
+				if (category == 6) //카테고리가 Total일 경우
 				{
-					resultlog = alinelog; //결과에 해당 로그를 저장합니다.
-					FilteredLog.push_back(resultlog.c_str());
-					resultfile << resultlog << endl;
-				} 
+					if (keywordBuf.find("&") != -1) //&연산자 이용 검색
+					{
+						string firstand, secondand;
+						firstand = secondand = "";
+						int andcnt = 0;
+
+						andcnt = keywordBuf.find("&");
+						firstand = keywordBuf.substr(0, andcnt);
+						keywordBuf.erase(0, andcnt +1);
+						secondand =  keywordBuf;
+
+						if (devidedlog.find(firstand) != -1) //첫번째 검색인자 확인
+						{
+							if (devidedlog.find(secondand) != -1) //두번째 검색인자 확인
+							{
+								resultlog = alinelog; //결과에 해당 로그를 저장합니다.
+								FilteredLog.push_back(resultlog.c_str());
+								resultfile << resultlog << endl;
+							}
+							else
+							{
+							
+							}
+						}
+						else
+						{
+						}
+					}
+					else if (keywordBuf.find("|") != -1) //|연산자 이용 검색
+					{
+						string firstand, secondand;
+						firstand = secondand = "";
+						int andcnt = 0;
+
+						andcnt = keywordBuf.find("|");
+						firstand = keywordBuf.substr(0, andcnt);
+						keywordBuf.erase(0, andcnt +1);
+						secondand =  keywordBuf;
+
+						if (devidedlog.find(firstand) != -1) //첫번째 검색인자 확인
+						{
+							resultlog = alinelog; //결과에 해당 로그를 저장합니다.
+							FilteredLog.push_back(resultlog.c_str());
+							resultfile << resultlog << endl;	
+						}
+						else if (devidedlog.find(secondand) != -1) //두번째 검색인자 확인
+						{
+							resultlog = alinelog; //결과에 해당 로그를 저장합니다.
+							FilteredLog.push_back(resultlog.c_str());
+							resultfile << resultlog << endl;
+						}
+						else
+						{
+
+						}
+					}
+				}
 				else
 				{
+
+					//키워드가 해당 로그에 존재하는지 검사합니다.
+					if (devidedlog.find(keywordBuf) != -1)
+					{
+						resultlog = alinelog; //결과에 해당 로그를 저장합니다.
+						FilteredLog.push_back(resultlog.c_str());
+						resultfile << resultlog << endl;
+					} 
+					else
+					{
+
+					}
 
 				}
 			}
