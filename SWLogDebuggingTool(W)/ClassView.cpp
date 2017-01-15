@@ -3,6 +3,12 @@
 #include "ClassView.h"
 #include "Resource.h"
 #include "SWLogDebuggingTool(W).h"
+#include "ChildFrm.h"
+#include "SWLogDebuggingTool(W)Doc.h"
+#include "LogFileView.h"
+#include "LogFtView.h"
+#include "DFilterView.h"
+#include "PropertiesWnd.h"
 
 #define MY_MULTI_SERVER "234.56.78.9"
 #define MY_TCP_PORT 18840
@@ -14,6 +20,17 @@ CViewTree m_wndClassView;
 int iUdpMultiSock, iUdpUniSock, iUdpSndSock;
 int iTCPSocket;
 static char* pcAgentIP;
+
+//Agent IP저장되는 변수
+static string sAgentIP;
+//Agent 이름 저장되는 변수
+static string sAgentName;
+//Agent HDD사용량 저장 변수
+static char cHDDUSage[4096];
+//Agent CPU 사용량 저장 변수
+static float fCPUUsage;
+//Agent RAM 사용량 저장 변수
+static DWORD dwRAMUsage;
 
 class CClassViewMenuButton : public CMFCToolBarMenuButton
 {
@@ -77,7 +94,6 @@ BEGIN_MESSAGE_MAP(CClassView, CDockablePane)
 	ON_NOTIFY(NM_CLICK, IDC_MY_TREE_VIEW, &OnAgentRcsoReq_OnClick)
 	//ON_NOTIFY(TVN_ENDLABELEDIT, IDC_MY_TREE_VIEW, &OnEndLabelEditTreeCtrl)
 	ON_MESSAGE(WM_TREEVIEW_REFRESH_EVENT, Treeview_Refresh)
-	ON_MESSAGE(WM_TREEVIEW_PVIEW_EVENT, MessageToPV)
 
 	ON_COMMAND(ID_AgentDirChange, &CClassView::OnAgentdirchange)
 END_MESSAGE_MAP()
@@ -368,10 +384,7 @@ void CClassView::AdjustLayout()
 	m_wndClassView.SetWindowPos(NULL, rectClient.left + 1, rectClient.top + cyTlb + 1, rectClient.Width() - 2, rectClient.Height() - cyTlb - 2, SWP_NOACTIVATE | SWP_NOZORDER);
 }
 
-BOOL CClassView::PreTranslateMessage(MSG* pMsg)
-{
-	return CDockablePane::PreTranslateMessage(pMsg);
-}
+
 
 void CClassView::OnSort(UINT id)
 {
@@ -945,7 +958,7 @@ UINT CClassView::Thread_Info_Rcv(LPVOID pParam)
 	AddrStruct.sin_port = htons(MY_UDP_PORT);
 	bind(iUdpUniSock, (SOCKADDR*)&AddrStruct, sizeof(AddrStruct));
 
-	mUDPCommunication.RcvInfor(iUdpUniSock, 2);
+	mUDPCommunication.RcvInfor(iUdpUniSock, 5);
 
 	return 0;
 }
@@ -954,21 +967,21 @@ UINT CClassView::Thread_RcsReq_Click(LPVOID pParam)
 {
 	TCPCommunication mTCPCommunication;
 	int iTCPSocket = 0;
-	CString csPVDataSum;
+	
 	/*list<CString> listpv;*/
 
 	string sItem = "";
 
-	//Agent IP저장되는 변수
-	string sAgentIP = "";
-	//Agent 이름 저장되는 변수
-	string sAgentName ="";
-	//Agent HDD사용량 저장 변수
-	char cHDDUSage[4096];
-	//Agent CPU 사용량 저장 변수
-	float fCPUUsage = 0;
-	//Agent RAM 사용량 저장 변수
-	DWORD dwRAMUsage = 0;
+// 	//Agent IP저장되는 변수
+// 	string sAgentIP = "";
+// 	//Agent 이름 저장되는 변수
+// 	string sAgentName ="";
+// 	//Agent HDD사용량 저장 변수
+// 	char cHDDUSage[4096];
+// 	//Agent CPU 사용량 저장 변수
+// 	float fCPUUsage = 0;
+// 	//Agent RAM 사용량 저장 변수
+// 	DWORD dwRAMUsage = 0;
 
 	TV_HITTESTINFO hit_info;
 
@@ -984,9 +997,11 @@ UINT CClassView::Thread_RcsReq_Click(LPVOID pParam)
 	HTREEITEM ChildITem;
 	HTREEITEM ListITem;
 	list<string> LogList;
+	memset(cHDDUSage, 0, sizeof(cHDDUSage));
 
 	int iIndex = 0;
-
+	char* cpHDDUsage;
+	string sHDDUsage = "";
 	string sPItem = "";
 	BOOL bCnctFlag;
 	if(current_item != NULL)
@@ -1008,6 +1023,9 @@ UINT CClassView::Thread_RcsReq_Click(LPVOID pParam)
 			bCnctFlag = mTCPCommunication.TryCnct(iTCPSocket, pcAgtIP, MY_TCP_PORT);
 			if(bCnctFlag == TRUE)
 			{
+				//cpHDDUsage = mTCPCommunication.ReqRsc(iTCPSocket, fCPUUsage, dwRAMUsage);
+				//sHDDUsage = &cpHDDUsage;
+				//memcpy(&cHDDUSage, sHDDUsage.c_str(), strlen(sHDDUsage.c_str()));
 				memcpy(&cHDDUSage, mTCPCommunication.ReqRsc(iTCPSocket, fCPUUsage, dwRAMUsage), 4096);
 			}
 
@@ -1025,51 +1043,103 @@ UINT CClassView::Thread_RcsReq_Click(LPVOID pParam)
 			//::SendMessage(pcThis->GetSafeHwnd(), WM_TREEVIEW_REFRESH_EVENT, (WPARAM)current_item, 0);
 			//AfxGetMainWnd()->SendMessage(WM_TREEVIEW_REFRESH_EVENT, 0, 0);
 		}
-
-		CString csBuf;
 		
+		CClassView *pcThis1 = (CClassView*)pParam;
+		::PostMessage(pcThis1->GetSafeHwnd(), WM_TREEVIEW_PVIEW_EVENT, 0, 0);
+		
+	}
+	return 0;
+}
+
+BOOL CClassView::PreTranslateMessage(MSG* pMsg)
+{
+	switch(pMsg->message)
+	{
+	case WM_TREEVIEW_PVIEW_EVENT:
+		CString csBuf;
+		CMainFrame* pFrame = (CMainFrame*)AfxGetMainWnd();
+		CPropertiesWnd *pProWnd = (CPropertiesWnd*)pFrame->GetPropertyViewPT();
+
 		if (sAgentName.length()>0)
 		{
 			csBuf = sAgentName.c_str();
-			csPVDataSum = csBuf;
+			pProWnd->csAgentName = csBuf;
+			pProWnd->bCheckInfo = 2;
 		}
-		
+
 		if (sAgentIP.length()>0)
 		{
 			csBuf = sAgentIP.c_str();
-			csPVDataSum = csPVDataSum +"\\"+csBuf;
+			pProWnd->csAgentIP = csBuf;
 		} 
-		
+
 		if (fCPUUsage > 0)
 		{
 			csBuf.Format(_T("%f"), fCPUUsage);
-			csPVDataSum =csPVDataSum +"\\"+csBuf;
+			pProWnd->csAgentCPU = csBuf + " %";
 		} 
-		
-		
 		if (dwRAMUsage != 0)
 		{
 			csBuf.Format(_T("%u"), dwRAMUsage);
-			csPVDataSum = csPVDataSum +"\\"+csBuf;
+			pProWnd->csAgentMEM = csBuf + " %";
 		}
 
-		if (cHDDUSage != "")
+		if (cHDDUSage != NULL)
 		{
-			csBuf = (LPSTR)cHDDUSage;
-			csPVDataSum =csPVDataSum +"\\"+csBuf;
+			CString cstr;
+			CString csleftbuf;
+			CString csrightbuf;
+			cstr.Format("%s", cHDDUSage);
+			csleftbuf = cstr.Left(cstr.Find(_T("D")));
+			csrightbuf = cstr.Right(cstr.Find(_T("D")));
+			csleftbuf.Remove('\\');
+			csrightbuf.Remove('\\');
+
+			CString strTok;
+			CString csleftbuf2 = csleftbuf;
+			int sepCnt = csleftbuf2.Remove('/');
+			
+			if (sepCnt > 0)
+			{
+				CString* temp = new CString[sepCnt + 1];
+
+				int cnt = 0;
+				while(AfxExtractSubString(strTok, csleftbuf, cnt, '/'))
+					temp[cnt++] = strTok;
+
+				csleftbuf = temp[0] + " " + temp[2] + "/" + temp[1];
+				
+				CString strTok1;
+				CString csrightbuf2 = csrightbuf;
+				int sepCnt2 = csrightbuf2.Remove('/');
+
+				CString* temp1 = new CString[sepCnt2 + 1];
+
+				int cnt1 = 0;
+				while(AfxExtractSubString(strTok, csrightbuf, cnt1, '/'))
+					temp1[cnt1++] = strTok;
+
+				csrightbuf = temp1[0] + " " + temp1[2] + "/" + temp1[1];
+
+			}
+			csBuf = csleftbuf + ", " + csrightbuf + " GB";
+			
+			pProWnd->csAgentDISK = csBuf;
 		} 
 
 		if ( (sAgentName.length()<0)||(sAgentIP.length()<0)||(fCPUUsage<0)||(cHDDUSage == "")||(dwRAMUsage == 0) )
 		{
-			csBuf = "-1";
-			csPVDataSum =csBuf;
+			pProWnd->bCheckInfo = 1;
 		}
-
-		CClassView *pcThis1 = (CClassView*)pParam;
-		::PostMessage(pcThis1->GetSafeHwnd(), WM_TREEVIEW_PVIEW_EVENT, 0, (LPARAM)&csPVDataSum);
-		
+		sAgentIP = "";
+		sAgentIP = "";
+		fCPUUsage = 0;
+		dwRAMUsage = 0;
+		memset(cHDDUSage, NULL, 4096);
+		pProWnd->Invalidate(TRUE);
+		break;
 	}
-	return 0;
+	return CDockablePane::PreTranslateMessage(pMsg);
 }
 
 HRESULT CClassView::Treeview_Refresh(WPARAM wParam, LPARAM lParam)
@@ -1111,62 +1181,6 @@ HRESULT CClassView::Treeview_Refresh(WPARAM wParam, LPARAM lParam)
 	m_wndClassView.Expand(hChildItem, TVE_EXPAND);
 	m_wndClassView.Invalidate();
 	m_wndClassView.UpdateWindow();
-
-	return TRUE;
-}
-
-HRESULT CClassView::MessageToPV(WPARAM wParam, LPARAM lParam)
-{
-
-// 	list<CString> cslstPVdata;
-// 	cslstPVdata = (list<CString>)lParam;
-
-// 	CString* csPVdata;
-// 	csPVdata = (CString*)lParam;
-// 	CString msg;
-// 	msg.Format("%s", *csPVdata);
-// 	CMainFrame* pFrame = (CMainFrame*)AfxGetMainWnd();
-// 	CPropertiesWnd *pProWnd = (CPropertiesWnd*)pFrame->GetPropertyViewPT();
-// 
-// 	int a = msg.GetLength();
-// 	if (a > 0)
-// 	{
-// 		pProWnd->csAgentIP = "1";
-// 	}
-// // 	int i = 0;
-// // 	for (list<CString>::iterator iterpos = cslstPVdata.begin(); iterpos != cslstPVdata.end();++iterpos)
-// // 	{
-// // 		switch(i)
-// // 		{
-// // 		case 0:
-// // 			if (*iterpos == "-1")
-// // 			{
-// // 				pProWnd->bAgentInfo = FALSE;
-// // 				break;
-// // 			} 
-// // 			else
-// // 			{
-// // 				pProWnd->bAgentInfo = TRUE;
-// // 				pProWnd->csAgentName = *iterpos;
-// // 				break;
-// // 			}
-// // 		case 1:
-// // 			pProWnd->csAgentIP = *iterpos;
-// // 			break;
-// // 		case 2:
-// // 			pProWnd->csAgentCPU = *iterpos;
-// // 			break;
-// // 		case 3:
-// // 			pProWnd->csAgentMEM = *iterpos;
-// // 			break;
-// // 		case 4:
-// // 			pProWnd->csAgentDISK = *iterpos;
-// // 			break;
-// // 		}
-// // 		i++;
-// // 	}
-// // 	pProWnd->Invalidate(TRUE);
-// 	pProWnd->Invalidate(TRUE);
 
 	return TRUE;
 }

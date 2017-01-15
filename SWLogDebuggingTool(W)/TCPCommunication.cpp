@@ -412,12 +412,13 @@ char* TCPCommunication::ReqRsc(int& iTCPSock, float& CPUUsage, DWORD& RAMUsage)
 
 	CPUUsage = MyAgtRcsMsg.fCPUUsage;
 	RAMUsage = MyAgtRcsMsg.dwRAMUsage;
-	memcpy(&HDDUsage, MyAgtRcsMsg.cHDDUsage, sizeof(HDDUsage));
+	memcpy(HDDUsage, MyAgtRcsMsg.cHDDUsage, strlen(MyAgtRcsMsg.cHDDUsage));
 
 	//AfxMessageBox("Rsc Req and Rcv is Done");
 	shutdown(iTCPSock, SD_SEND);
 	closesocket(iTCPSock);
 
+	return MyAgtRcsMsg.cHDDUsage;
 	return HDDUsage;
 }
 
