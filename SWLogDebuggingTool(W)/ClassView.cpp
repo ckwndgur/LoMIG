@@ -1043,11 +1043,45 @@ BOOL CClassView::PreTranslateMessage(MSG* pMsg)
 			pProWnd->csAgentMEM = csBuf + " %";
 		}
 
-		if (cHDDUSage != "")
+		if (cHDDUSage != NULL)
 		{
 			CString cstr;
+			CString csleftbuf;
+			CString csrightbuf;
 			cstr.Format("%s", cHDDUSage);
-			csBuf = cstr.Left(cstr.Find(_T("D"))) + ", " + cstr.Right(cstr.Find(_T("D"))) + " GB";
+			csleftbuf = cstr.Left(cstr.Find(_T("D")));
+			csrightbuf = cstr.Right(cstr.Find(_T("D")));
+			csleftbuf.Remove('\\');
+			csrightbuf.Remove('\\');
+
+			CString strTok;
+			CString csleftbuf2 = csleftbuf;
+			int sepCnt = csleftbuf2.Remove('/');
+			
+			if (sepCnt > 0)
+			{
+				CString* temp = new CString[sepCnt + 1];
+
+				int cnt = 0;
+				while(AfxExtractSubString(strTok, csleftbuf, cnt, '/'))
+					temp[cnt++] = strTok;
+
+				csleftbuf = temp[0] + " " + temp[2] + "/" + temp[1];
+				
+				CString strTok1;
+				CString csrightbuf2 = csrightbuf;
+				int sepCnt2 = csrightbuf2.Remove('/');
+
+				CString* temp1 = new CString[sepCnt2 + 1];
+
+				int cnt1 = 0;
+				while(AfxExtractSubString(strTok, csrightbuf, cnt1, '/'))
+					temp1[cnt1++] = strTok;
+
+				csrightbuf = temp1[0] + " " + temp1[2] + "/" + temp1[1];
+
+			}
+			csBuf = csleftbuf + ", " + csrightbuf + " GB";
 			
 			pProWnd->csAgentDISK = csBuf;
 		} 
