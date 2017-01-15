@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iostream>
 
+#include "AgentDirDlg.h"
 #include "ViewTree.h"
 #include "UserConfig.h"
 #include "XMLManager.h"
@@ -81,6 +82,8 @@ public:
 	//BOOL SelectItems(HTREEITEM hItemFrom, HTREEITEM hItemTo);
 	//HTREEITEM GetFirstSelectedItem();
 	//HTREEITEM GetNextSelectedItem( HTREEITEM hItem );
+
+	/*char* pcAgentIP;*/
 
 	list<string> OpenXML(string sXMLDir);
 

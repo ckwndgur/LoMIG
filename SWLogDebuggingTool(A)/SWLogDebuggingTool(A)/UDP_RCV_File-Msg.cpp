@@ -51,7 +51,7 @@ int iLoadedFileLen;
 DWORD dTemp;
 
 float fCpuUsage;
-string sDiskFreeSpace;
+string sDiskFreeSpace ="";
 DWORD dwRAMUsage;
 
 struct AgtInfoMsgStruct MyAgentInfoMsg;
@@ -162,7 +162,7 @@ unsigned int __stdcall UDP_AgentInfoReq_Resp(void*)
 			memcpy(&MyAgentInfoMsg.cAgtIPAddr, cAgentIP, sizeof(MyAgentInfoMsg.cAgtIPAddr));
 			memcpy(&MyAgentInfoMsg.cAgtName, cAgentName, sizeof(MyAgentInfoMsg.cAgtName));
 			//memcpy(&MyAgentInfoMsg.cAgtFileList, cAgentFileList, sizeof(MyAgentInfoMsg.cAgtFileList));
-			memcpy(&MyAgentInfoMsg.cAgtLogDir, &cFileDir, sizeof(MyAgentInfoMsg.cAgtIPAddr));
+			memcpy(&MyAgentInfoMsg.cAgtLogDir, cFileDir, sizeof(MyAgentInfoMsg.cAgtLogDir));
 
 			int iDelay = mDataCollisionAvoidence.CollisionAvoidence(5000);
 
@@ -367,7 +367,7 @@ unsigned int __stdcall TCP_AgentLogReq_Resp(void*)
 					MyAgtDataMsg.bLastPacket = TRUE;
 				}
 
-				if(send(iTCP_CltSock, (char*)&MyAgtDataMsg, sizeof(struct AgtDataMsgStruct), 0)==-1)
+				if(send(iTCP_CltSock, (char*)&MyAgtDataMsg, sizeof((char*)&MyAgtDataMsg), 0)==-1)
 					printf("Agent Log Trans Failed\n");
 
 				Sleep(1);
@@ -391,7 +391,7 @@ unsigned int __stdcall TCP_AgentLogReq_Resp(void*)
 			printf("===================================================================\n");
 			
 			GetSystemResource();
-
+			memset(&MyAgtRcsMsg, 0, sizeof(struct AgtRcsMsgStruct));
 			MyAgtRcsMsg.fCPUUsage = fCpuUsage;
 			MyAgtRcsMsg.dwRAMUsage = dwRAMUsage;
 			memcpy(&MyAgtRcsMsg.cHDDUsage, sDiskFreeSpace.c_str(), strlen(sDiskFreeSpace.c_str()));

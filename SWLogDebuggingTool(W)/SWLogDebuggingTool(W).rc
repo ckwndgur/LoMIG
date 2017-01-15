@@ -389,6 +389,17 @@ BEGIN
     DEFPUSHBUTTON   "»Æ¿Œ",IDOK,113,41,50,14,WS_GROUP
 END
 
+IDD_AGENTDIRDLG DIALOGEX 0, 0, 316, 57
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "New Directory"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,205,36,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,259,36,50,14
+    EDITTEXT        IDC_DIRINPUT,7,20,302,16,ES_AUTOHSCROLL
+    LTEXT           "New Directory",IDC_STATIC,8,8,80,12
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -444,9 +455,24 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 55
     END
+
+    IDD_AGENTDIRDLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 309
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 50
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// HTML
+//
+
+IDR_HTML_AGENTDIRINPUT  HTML                    "AgentDirInput.htm"
 
 /////////////////////////////////////////////////////////////////////////////
 //
