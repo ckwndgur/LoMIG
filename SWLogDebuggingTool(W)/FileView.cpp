@@ -413,11 +413,6 @@ BOOL CFileView::PreTranslateMessage(MSG* pMsg)
 		{
 			m_wndFileView.Select(current_item, TVGN_CARET);
 			
-// 			while(m_wndFileView.GetChildItem(current_item) != NULL)
-// 			{
-// 				current_item = m_wndFileView.GetChildItem(current_item);
-// 			}
-			
 			int cnt = 0;
 			while(m_wndFileView.GetParentItem(current_item) != NULL)
 			{
@@ -439,7 +434,7 @@ BOOL CFileView::PreTranslateMessage(MSG* pMsg)
 
 				pProWnd->csWatcherFileName = csSelectedFileName;
 				pProWnd->csWatcherFileDirectory = csSelectedDirectory;
-				pProWnd->bWatcherInfo = true;
+				pProWnd->bCheckInfo = 3;
 				CString csbuf = "C:\\" + csSelectedDefault + "\\" + csSelectedDate + "\\" + csSelectedIP + "\\";
 				
 				HANDLE hFile;
@@ -449,7 +444,7 @@ BOOL CFileView::PreTranslateMessage(MSG* pMsg)
 				//ifilesize = mTextManager.GetFileSize((LPSTR)(LPCTSTR)csbuf, (LPSTR)(LPCTSTR)csSelectedFileName);
 				CString csfilesize = "";
 				csfilesize.Format(_T("%d"), ifilesize);
-				pProWnd->csWatcherFileSize = csfilesize;
+				pProWnd->csWatcherFileSize = csfilesize + " Byte";
 				
 				CloseHandle(hFile);
 
@@ -457,6 +452,7 @@ BOOL CFileView::PreTranslateMessage(MSG* pMsg)
 			} 
 			else
 			{
+				pProWnd->bCheckInfo = 1;
 				pProWnd->csWatcherFileDirectory = "";
 				pProWnd->csWatcherFileName = "";
 				pProWnd->csWatcherFileSize = "";

@@ -36,6 +36,7 @@
 #endif // _AFX_NO_AFXCMN_SUPPORT
 
 #include <afxcontrolbars.h>     // MFC의 리본 및 컨트롤 막대 지원
+#include <afxdhtml.h>
 
 
 #define UM_FilteredMESSAGE WM_USER + 1

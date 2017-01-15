@@ -42,6 +42,7 @@ public:
 	virtual ~CPropertiesWnd();
 
 public:
+	int bCheckInfo;
 	bool bAgentInfo;
 	CString csAgentName;
 	CString csAgentIP;
