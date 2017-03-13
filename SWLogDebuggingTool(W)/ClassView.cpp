@@ -20,6 +20,7 @@ TCPCommunication mTCPCommunication;
 CViewTree m_wndClassView;
 int iUdpMultiSock, iUdpUniSock, iUdpSndSock;
 int iTCPSocket;
+static char* pcAgentIP;
 
 //Agent IP저장되는 변수
 static string sAgentIP;
@@ -92,7 +93,7 @@ BEGIN_MESSAGE_MAP(CClassView, CDockablePane)
 	ON_NOTIFY(NM_RETURN, IDC_MY_TREE_VIEW, &OnSelchangedTree)
 	ON_NOTIFY(TVN_SELCHANGED, IDC_MY_TREE_VIEW, &OnSelchangedTree)
 	ON_NOTIFY(NM_CLICK, IDC_MY_TREE_VIEW, &OnAgentRcsoReq_OnClick)
-	ON_NOTIFY(TVN_ENDLABELEDIT, IDC_MY_TREE_VIEW, &OnEndLabelEditTreeCtrl)
+	//ON_NOTIFY(TVN_ENDLABELEDIT, IDC_MY_TREE_VIEW, &OnEndLabelEditTreeCtrl)
 	ON_MESSAGE(WM_TREEVIEW_REFRESH_EVENT, Treeview_Refresh)
 
 	ON_COMMAND(ID_AgentDirChange, &CClassView::OnAgentdirchange)
@@ -693,6 +694,44 @@ UINT CClassView::Thread_AgentDirChange(LPVOID pParam)
 	UserConfig mUserConfig;
 	int iTCPSocket = 0;
 
+	//CString* pcAgentIP = (CString*)pParam;
+
+
+	//Cstring으로 받아와서 char*로 전환하는 과정////////////
+	CString* csAgentIP = (CString*)pParam;
+	std::string sAgentIP = (LPSTR)(LPCTSTR)*csAgentIP;//csAgentIP;
+	char caAgentIP[15];
+	memset(caAgentIP, 0, sizeof(caAgentIP));
+	memcpy(caAgentIP, sAgentIP.c_str(), strlen(sAgentIP.c_str()));
+
+	char* pcAgentIP = &caAgentIP[0];
+	//char* pcAgentIP = new char[sAgentIP.size()+1];
+	/*std::copy(sAgentIP.begin(), sAgentIP.end(), pcAgentIP);*/
+	/////////////////////////////////////////////////////////
+
+
+	string sAgentLogDir ="";
+	string sXMLDir = mUserConfig.GetExeDirectory() + "AgtInfo\\" + sAgentIP + ".xml";
+	sAgentLogDir = mXMLManager.Parsing_Target_XML(sXMLDir, "AgentInfo", "AgentLogFileDirectory");
+	
+	mTCPCommunication.TCPSockInit(iTCPSocket);
+	if(mTCPCommunication.TryCnct(iTCPSocket, pcAgentIP, MY_TCP_PORT) == TRUE)
+	{
+		mTCPCommunication.AgentDirChange(iTCPSocket, sAgentLogDir);
+	}
+	else
+	{
+
+	}
+	
+	//delete csAgentIP;
+	//delete[] pcAgentIP;
+	/*트리뷰에서 직접 편집하여 Agent의 경로를 변경할 때 사용하는 코드
+	TCPCommunication mTCPCommunication;
+	XMLManager mXMLManager;
+	UserConfig mUserConfig;
+	int iTCPSocket = 0;
+
 	CClassView *Thread_View = (CClassView*)pParam;
 
 	HTREEITEM hItem = m_wndClassView.GetSelectedItem();
@@ -729,7 +768,8 @@ UINT CClassView::Thread_AgentDirChange(LPVOID pParam)
 		{
 
 		}
-	}
+	}*/
+	
 	return 0;
 }
 
@@ -809,6 +849,7 @@ UINT CClassView::Thread_Log_Req(LPVOID pParam)
 			
 			m_wndClassView.DeleteItem(hItem);
 			AfxMessageBox("유효하지 않은 파일입니다.");
+
 			sFileList = mXMLManager.Parsing_Target_XML(mUserConfig.GetExeDirectory() + "AgtInfo\\"+sAgentIP+".xml", "AgentInfo", "AgentLogFileList");
 			sLogFileName = "\n"+sLogFileName;
 
@@ -1402,9 +1443,50 @@ void CClassView::OnMultiSelect()
 */
 void CClassView::OnAgentdirchange()
 {
-	// TODO: Add your command handler code here
+	//선택한 아이템 획특
+	HTREEITEM current_item = m_wndClassView.GetSelectedItem();
+	HTREEITEM ParentItem;
+	HTREEITEM GrandParentItem;
+	HTREEITEM ChildITem;
+	HTREEITEM ListITem;
+	list<string> LogList;
+
+	int iIndex = 0;
+
+	string sPItem = "";
+	string sGPItem = "";
+	string sAgentIP = "";
+	CString* csAgentIP;
+
+	BOOL bCnctFlag;
+
+	if(current_item != NULL)
+	{
+		// 마우스가 위치한 항목을 찾았다면 해당 항목을 선택한다.
+		m_wndClassView.Select(current_item, TVGN_CARET);
+		ParentItem = m_wndClassView.GetParentItem(current_item);
+		GrandParentItem = m_wndClassView.GetParentItem(ParentItem);
+		
+		sPItem = m_wndClassView.GetItemText(ParentItem);
+		sGPItem = m_wndClassView.GetItemText(GrandParentItem);
+
+		if(sGPItem == "노드 목록")
+		{
+			iIndex = sPItem.find_first_of("/");
+			sAgentIP = sPItem.substr(0, iIndex);
+			
+			CAgentDirDlg mCDirDlg;
+			mCDirDlg.sAgentIP = sAgentIP;
+			mCDirDlg.DoModal();
+		}
+	}
+	//pcAgentIP = new char[strlen(sAgentIP.c_str())];
+	//pcAgentIP =	&sAgentIP[0u];
+
+	csAgentIP = new CString(sAgentIP.c_str());
+
 	CWinThread *AgtDirChgThread = NULL;
-	AgtDirChgThread = AfxBeginThread(Thread_AgentDirChange,this);
+	AgtDirChgThread = AfxBeginThread(Thread_AgentDirChange, csAgentIP);
 }
 
 void CClassView::OnEndLabelEditTreeCtrl(NMHDR* pNMHDR, LRESULT* pResult)
