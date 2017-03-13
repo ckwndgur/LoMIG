@@ -13,9 +13,10 @@
 
 #include "stdafx.h"
 #include "afxcmn.h"
-#include "FileView.h"
+//#include "FileView.h"
 #include "TreeviewManager.h"
 #include "TreeviewData.h"
+
 
 //#include "EditTreeCtrl.h"
 // #include "EditTreeCtrlEx.h"
@@ -86,7 +87,7 @@ public:
 
 	//protected:
 	CClassToolBar m_wndToolBar;
-	CFileView mCFileView;
+	//CFileView mCFileView;
 	//CViewTree m_wndClassView;
 	CImageList m_ClassViewImages;
 	UINT m_nCurrSort;

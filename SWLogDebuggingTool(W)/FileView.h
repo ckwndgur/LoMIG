@@ -71,6 +71,8 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 
+	HTREEITEM m_hItemFirstSel;
+
 private:
 	TextManager mTextManager;
 	TreeviewData *mSelTVData;
@@ -84,6 +86,13 @@ private:
 
 	void MakeTreeview(CString pstr);
 	CSize Cal_scrollview(CString fulldirectory);
+	void MessageToPV(TV_HITTESTINFO hitinfo, HTREEITEM selitem);
+// 	void MultiSelection_ctl(TV_HITTESTINFO hitinfo, HTREEITEM selitem);
+// 	void MultiSelection_shift(TV_HITTESTINFO hitinfo, HTREEITEM selitem);
+// 	void ClearSelection();
+// 	BOOL SelectItems(HTREEITEM hItemFrom, HTREEITEM hItemTo);
+// 	void ShiftKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+	
 	
 public:
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
