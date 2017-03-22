@@ -1,11 +1,12 @@
 //#include "EditTreeCtrlEx.h"
 
 #pragma once
+#include "EditTreeCtrlEx.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CViewTree 창입니다.
 
-class CViewTree : public CTreeCtrl//CEditTreeCtrlEx //
+class CViewTree : public CEditTreeCtrlEx
 {
 // 생성입니다.
 public:

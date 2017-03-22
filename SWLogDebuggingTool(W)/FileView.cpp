@@ -25,6 +25,7 @@ static char THIS_FILE[]=__FILE__;
 
 CFileView::CFileView()
 {
+	m_hItemFirstSel = NULL;
 }
 
 CFileView::~CFileView()
@@ -88,6 +89,7 @@ int CFileView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// 정적 트리 뷰 데이터를 더미 코드로 채웁니다.
 	FillFileView();
 	AdjustLayout();
+	m_wndFileView.EnableMultiSelect(true);
 
 	return 0;
 }
@@ -175,7 +177,7 @@ void CFileView::FillFileView()
 
 void CFileView::OnContextMenu(CWnd* pWnd, CPoint point)
 {
-	CTreeCtrl* pWndTree = (CTreeCtrl*) &m_wndFileView;
+	CEditTreeCtrlEx* pWndTree = (CEditTreeCtrlEx*) &m_wndFileView;
 	ASSERT_VALID(pWndTree);
 
 	if (pWnd != pWndTree)
@@ -388,81 +390,97 @@ void CFileView::OnLButtonDown(UINT nFlags, CPoint point)
 BOOL CFileView::PreTranslateMessage(MSG* pMsg)
 {
 	// TODO: Add your specialized code here and/or call the base class
+
 	switch(pMsg->message)
 	{
 	case WM_LBUTTONDOWN :
-		CMainFrame* pFrame = (CMainFrame*)AfxGetMainWnd();
-		CPropertiesWnd *pProWnd = (CPropertiesWnd*)pFrame->GetPropertyViewPT();
-
-		TV_HITTESTINFO hit_info;
-		::GetCursorPos(&hit_info.pt);
-		::ScreenToClient(m_wndFileView.m_hWnd, &hit_info.pt);
-		HTREEITEM init_item = m_wndFileView.HitTest(&hit_info);
-		HTREEITEM current_item = init_item;
-		HTREEITEM selected_DateItem;
-		HTREEITEM selected_IPItem;
-		HTREEITEM selected_DefaultItem;
-
-		CString csSelectedFileName;
-		CString csSelectedIP;
-		CString csSelectedDate;
-		CString csSelectedDefault;
-		CString csSelectedDirectory;
-
-		if(current_item != NULL)
 		{
-			m_wndFileView.Select(current_item, TVGN_CARET);
-			
-			int cnt = 0;
-			while(m_wndFileView.GetParentItem(current_item) != NULL)
+			BOOL bControlKey = (0x8000 == (0x8000 & GetKeyState(VK_CONTROL)));
+			BOOL bShiftKey = (0x8000 == (0x8000 & GetKeyState(VK_SHIFT)));
+			if(!(bControlKey || bShiftKey))
 			{
-				current_item = m_wndFileView.GetParentItem(current_item);
-				cnt++;
+				TV_HITTESTINFO hit_info;
+				::GetCursorPos(&hit_info.pt);
+				::ScreenToClient(m_wndFileView.m_hWnd, &hit_info.pt);
+				HTREEITEM selitem = m_wndFileView.HitTest(&hit_info);
+
+				MessageToPV(hit_info, selitem);
 			}
-			
-			if (cnt == 3)
-			{
-				csSelectedFileName = m_wndFileView.GetItemText(init_item);
-				selected_IPItem = m_wndFileView.GetParentItem(init_item);
-				csSelectedIP = m_wndFileView.GetItemText(selected_IPItem);
-				selected_DateItem = m_wndFileView.GetParentItem(selected_IPItem);
-				csSelectedDate = m_wndFileView.GetItemText(selected_DateItem);
-				selected_DefaultItem = m_wndFileView.GetParentItem(selected_DateItem);
-				csSelectedDefault = m_wndFileView.GetItemText(selected_DefaultItem);
-				
-				csSelectedDirectory = "C:\\" + csSelectedDefault + "\\" + csSelectedDate + "\\" + csSelectedIP + "\\" + csSelectedFileName;
-
-				pProWnd->csWatcherFileName = csSelectedFileName;
-				pProWnd->csWatcherFileDirectory = csSelectedDirectory;
-				pProWnd->bCheckInfo = 3;
-				CString csbuf = "C:\\" + csSelectedDefault + "\\" + csSelectedDate + "\\" + csSelectedIP + "\\";
-				
-				HANDLE hFile;
-				csSelectedDirectory += ".txt";
-				hFile = ::CreateFile(csSelectedDirectory, 0, 0, NULL, OPEN_EXISTING, 0, NULL);
-				UINT ifilesize = GetFileSize(hFile, NULL);
-				//ifilesize = mTextManager.GetFileSize((LPSTR)(LPCTSTR)csbuf, (LPSTR)(LPCTSTR)csSelectedFileName);
-				CString csfilesize = "";
-				csfilesize.Format(_T("%d"), ifilesize);
-				pProWnd->csWatcherFileSize = csfilesize + " Byte";
-				
-				CloseHandle(hFile);
-
-				pProWnd->Invalidate(FALSE);
-			} 
-			else
-			{
-				pProWnd->bCheckInfo = 1;
-				pProWnd->csWatcherFileDirectory = "";
-				pProWnd->csWatcherFileName = "";
-				pProWnd->csWatcherFileSize = "";
-
-				pProWnd->Invalidate(FALSE);
-			}
-
+			break;
 		}
-		break;
 	}
-
 	return CDockablePane::PreTranslateMessage(pMsg);
+}
+
+
+
+
+void CFileView::MessageToPV(TV_HITTESTINFO hitinfo, HTREEITEM selitem)
+{
+	CMainFrame* pFrame = (CMainFrame*)AfxGetMainWnd();
+	CPropertiesWnd *pProWnd = (CPropertiesWnd*)pFrame->GetPropertyViewPT();
+
+	HTREEITEM current_item = selitem;
+	HTREEITEM selected_DateItem;
+	HTREEITEM selected_IPItem;
+	HTREEITEM selected_DefaultItem;
+
+	CString csSelectedFileName;
+	CString csSelectedIP;
+	CString csSelectedDate;
+	CString csSelectedDefault;
+	CString csSelectedDirectory;
+
+	if(current_item != NULL)
+	{
+		m_wndFileView.Select(current_item, TVGN_CARET);
+
+		int cnt = 0;
+		while(m_wndFileView.GetParentItem(current_item) != NULL)
+		{
+			current_item = m_wndFileView.GetParentItem(current_item);
+			cnt++;
+		}
+
+		if (cnt == 3)
+		{
+			csSelectedFileName = m_wndFileView.GetItemText(selitem);
+			selected_IPItem = m_wndFileView.GetParentItem(selitem);
+			csSelectedIP = m_wndFileView.GetItemText(selected_IPItem);
+			selected_DateItem = m_wndFileView.GetParentItem(selected_IPItem);
+			csSelectedDate = m_wndFileView.GetItemText(selected_DateItem);
+			selected_DefaultItem = m_wndFileView.GetParentItem(selected_DateItem);
+			csSelectedDefault = m_wndFileView.GetItemText(selected_DefaultItem);
+
+			csSelectedDirectory = "C:\\" + csSelectedDefault + "\\" + csSelectedDate + "\\" + csSelectedIP + "\\" + csSelectedFileName;
+
+			pProWnd->csWatcherFileName = csSelectedFileName;
+			pProWnd->csWatcherFileDirectory = csSelectedDirectory;
+			pProWnd->bCheckInfo = 3;
+			CString csbuf = "C:\\" + csSelectedDefault + "\\" + csSelectedDate + "\\" + csSelectedIP + "\\";
+
+			HANDLE hFile;
+			csSelectedDirectory += ".txt";
+			hFile = ::CreateFile(csSelectedDirectory, 0, 0, NULL, OPEN_EXISTING, 0, NULL);
+			UINT ifilesize = GetFileSize(hFile, NULL);
+			//ifilesize = mTextManager.GetFileSize((LPSTR)(LPCTSTR)csbuf, (LPSTR)(LPCTSTR)csSelectedFileName);
+			CString csfilesize = "";
+			csfilesize.Format(_T("%d"), ifilesize);
+			pProWnd->csWatcherFileSize = csfilesize + " Byte";
+
+			CloseHandle(hFile);
+
+			pProWnd->Invalidate(FALSE);
+		} 
+		else
+		{
+			pProWnd->bCheckInfo = 1;
+			pProWnd->csWatcherFileDirectory = "";
+			pProWnd->csWatcherFileName = "";
+			pProWnd->csWatcherFileSize = "";
+
+			pProWnd->Invalidate(FALSE);
+		}
+
+	}
 }

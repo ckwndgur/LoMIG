@@ -9,6 +9,7 @@
 #include "LogFtView.h"
 #include "DFilterView.h"
 #include "PropertiesWnd.h"
+#include "EditTreeCtrlEx.h"
 
 #define MY_MULTI_SERVER "234.56.78.9"
 #define MY_TCP_PORT 18840
@@ -327,7 +328,7 @@ void CClassView::FillClassView()
 
 void CClassView::OnContextMenu(CWnd* pWnd, CPoint point)
 {
-	CTreeCtrl* pWndTree = (CTreeCtrl*)&m_wndClassView;
+	CEditTreeCtrlEx* pWndTree = (CEditTreeCtrlEx*)&m_wndClassView;
 	ASSERT_VALID(pWndTree);
 
 	if (pWnd != pWndTree)
