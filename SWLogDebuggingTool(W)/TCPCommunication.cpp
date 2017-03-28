@@ -194,6 +194,7 @@ list<string> TCPCommunication::InfoRcv(int& iTCPServSock)
 		mXMLManager.EditElementXML("AgentInfo", "AgentIP", MyAgtInfoMsg.cAgtIPAddr);
 		mXMLManager.EditElementXML("AgentInfo", "AgentName", MyAgtInfoMsg.cAgtName);
 		mXMLManager.EditElementXML("AgentInfo", "AgentLogFileList", MyAgtInfoMsg.cAgtFileList);
+		mXMLManager.EditElementXML("AgentInfo", "AgentLogFileDirectory", MyAgtInfoMsg.cAgtLogDir);
 
 		std::string sAgtFileList(MyAgtInfoMsg.cAgtFileList);
 		std::stringstream strmAgtFileList(sAgtFileList);
@@ -313,8 +314,8 @@ BOOL TCPCommunication::LogFileReq(int& iRcvSocket, string sSaveDir, string sReqF
 		if(ilen > 0)
 		{
 			sWriteData = "";
-			sWriteData = MyAgtDataMsg.cLogData;
-			sWriteData = sWriteData.substr(0, 15000);
+			sWriteData += MyAgtDataMsg.cLogData;
+			//sWriteData = sWriteData.substr(0, 15000);
 			mTextManager.WriteText(cSaveDir, cReqFileName, sWriteData, MyAgtDataMsg.bLastPacket);
 			if(MyAgtDataMsg.bLastPacket)
 				break;

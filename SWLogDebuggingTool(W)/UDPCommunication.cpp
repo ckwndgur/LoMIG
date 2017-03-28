@@ -108,7 +108,7 @@ void UDPCommunication::InforReq(int& iSndSock, int iWatcherPort, char* cMultiGro
 		strcpy(cIPAddr, inet_ntoa(*(struct in_addr*)pHostInfo->h_addr_list[0]));
 	}
 
-	int ttl = 15;
+	int ttl = 5;
 	int iyes = 1;
 	int state = setsockopt(iSndSock,IPPROTO_IP,IP_MULTICAST_TTL,(char*)&ttl,sizeof(ttl));
 	if(state == SOCKET_ERROR)
@@ -225,7 +225,6 @@ list<string> UDPCommunication::RcvInfor(int& iRcvUniSock, int iTimeout_sec)
 		case -1:
 			//printf("RcvTimeOut Error\n");
 			break;
-
 		default:
 			recvfrom(iRcvUniSock, cRcvBuf, sizeof(cRcvBuf), 0, NULL, 0);
 
@@ -235,7 +234,6 @@ list<string> UDPCommunication::RcvInfor(int& iRcvUniSock, int iTimeout_sec)
 			mXMLManager.CreatXML_AgentInfo(MyAgtInfoMsg.cAgtIPAddr);
 			mXMLManager.EditElementXML("AgentInfo", "AgentIP", MyAgtInfoMsg.cAgtIPAddr);
 			mXMLManager.EditElementXML("AgentInfo", "AgentName", MyAgtInfoMsg.cAgtName);
-			//mXMLManager.EditElementXML("AgentInfo", "AgentLogDir", "CoreDebug"/*MyAgtInfoMsg.cAgtLogDir*/);
 			//mXMLManager.EditElementXML("AgentInfo", "AgentLogFileList", MyAgtInfoMsg.cAgtFileList);
 			mXMLManager.EditElementXML("AgentInfo", "AgentLogFileDirectory", MyAgtInfoMsg.cAgtLogDir);
 

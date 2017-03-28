@@ -18,6 +18,7 @@
 UDPCommunication mUDPCommunication;
 TCPCommunication mTCPCommunication;
 CViewTree m_wndClassView;
+
 int iUdpMultiSock, iUdpUniSock, iUdpSndSock;
 int iTCPSocket;
 static char* pcAgentIP;
@@ -92,7 +93,8 @@ BEGIN_MESSAGE_MAP(CClassView, CDockablePane)
 	ON_COMMAND(ID_AGENT_RscReq, &CClassView::OnAgentRscreq)
 	ON_NOTIFY(NM_RETURN, IDC_MY_TREE_VIEW, &OnSelchangedTree)
 	ON_NOTIFY(TVN_SELCHANGED, IDC_MY_TREE_VIEW, &OnSelchangedTree)
-	ON_NOTIFY(NM_CLICK, IDC_MY_TREE_VIEW, &OnAgentRcsoReq_OnClick)
+	//ON_NOTIFY(NM_CLICK, IDC_MY_TREE_VIEW, &OnAgentRcsoReq_OnClick)
+	ON_NOTIFY(NM_DBLCLK, IDC_MY_TREE_VIEW, &OnAgentRcsoReq_OnClick)
 	//ON_NOTIFY(TVN_ENDLABELEDIT, IDC_MY_TREE_VIEW, &OnEndLabelEditTreeCtrl)
 	ON_MESSAGE(WM_TREEVIEW_REFRESH_EVENT, Treeview_Refresh)
 
@@ -261,7 +263,9 @@ void CClassView::FillClassView()
 				AgentXMLList.push_back(m_XMLManager.Parsing_Target_XML(sFileDIrChk, "AgentInfo", "AgentIP"));
 				AgentXMLList.push_back(m_XMLManager.Parsing_Target_XML(sFileDIrChk, "AgentInfo", "AgentName"));
 				AgentXMLList.push_back(m_XMLManager.Parsing_Target_XML(sFileDIrChk, "AgentInfo", "AgentLogFileDirectory"));
-				AgentXMLList.push_back(m_XMLManager.Parsing_Target_XML(sFileDIrChk, "AgentInfo", "AgentLogFileList"));
+				string sFileList = m_XMLManager.Parsing_Target_XML(sFileDIrChk, "AgentInfo", "AgentLogFileList");
+				sFileList = sFileList.substr(0, strlen(sFileList.c_str())-1);
+				AgentXMLList.push_back(sFileList);
 			}
 		}
 	}while(FindNextFile(hFind, &FindData));
@@ -583,9 +587,6 @@ void CClassView::OnInfoLoad()
 
 void CClassView::OnAgentRcsoReq_OnClick(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	//클릭시 정보 저장 이벤트
-	GetClickInformation();
-
 	//Thread
 	CWinThread *RcsReqThread = NULL;
 	RcsReqThread = AfxBeginThread(Thread_RcsReq_Click, this);
@@ -787,59 +788,7 @@ UINT CClassView::Thread_Log_Req(LPVOID pParam)
 
 	CClassView *Thread_View = (CClassView*)pParam;
 	
-	string sFileDir;
-	string sDate;
-
-	bool bErrorFlag;
-	//트리뷰를 클릭하면서 구조체에 저장된 정보를 불러옴
-	//string sID = MyClassViewInformation.sID;
-	//string sSelectedItem = MyClassViewInformation.sSelectedItem;
-	//string sAgentIP = MyClassViewInformation.sAgentIP;
-	//string sAgentName = MyClassViewInformation.sAgentName;
-	//string slLogList = MyClassViewInformation.slLogList;
-
-	string sID;
-	string sSelectedItem;
-	string sAgentIP;
-	string sAgentName;
-	string slLogList;
-
-	char* pcAgtIP = &sAgentIP[0u];
-
-	if(sID == "IP")
-	{
-		//전체 로그 요청
-	}
-	else if(sID == "LOG")
-	{
-		//선택된 로그 요청
-		mTCPCommunication.TCPSockInit(iTCPSocket);
-		if(mTCPCommunication.TryCnct(iTCPSocket, pcAgtIP, MY_TCP_PORT) == TRUE)
-		{
-			time_t tTimer;
-			struct tm tTimer_St;
-			tTimer = time(NULL);
-			localtime_s(&tTimer_St, &tTimer);
-			int iToday = (tTimer_St.tm_year + 1900) * 10000 + (tTimer_St.tm_mon + 1) * 100 + (tTimer_St.tm_mday);
-			sDate << iToday;
-			string sLogDir = MyClassViewInformation.sLogDir;
-			sLogDir = mXMLManager.Parsing_Target_XML(mUserConfig.GetExeDirectory() + "Config.xml", "CommonPath", "Watcher");
-			sLogDir += "\\" + sDate.c_str() + "\\" + sAgentIP + "\\";
-
-			bErrorFlag = mTCPCommunication.LogFileReq(iTCPSocket, sLogDir, sSelectedItem, sFileDir);
-			if(bErrorFlag == -1)
-			{
-				return 1;
-			}
-		}
-		else
-		{
-
-		}
-	}
 	// TODO: Add your command handler code here
-	// 트리 컨트롤 코드
-	/*
 	HTREEITEM hItem = m_wndClassView.GetSelectedItem();
 	HTREEITEM hChild;
 	HTREEITEM hGrandChild;
@@ -996,8 +945,6 @@ UINT CClassView::Thread_Log_Req(LPVOID pParam)
 			}
 		}
 	}
-	*/
-
 	return 0;
 }
 
@@ -1029,49 +976,7 @@ UINT CClassView::Thread_RcsReq_Click(LPVOID pParam)
 	/*list<CString> listpv;*/
 
 	string sItem = "";
-	string sID = MyClassViewInformation.sID;
-	string sAgentIP = MyClassViewInformation.sAgentIP;
-	string sAgentName = MyClassViewInformation.sAgentName;
-	bool bCnctFlag;
-	int iIndex;
 
-
-	if(sID == "노드 목록")
-	{
-		iIndex = sItem.find_first_of("/");
-		sAgentIP = sItem.substr(0, iIndex);
-		sAgentName = sItem.substr(iIndex+1, strlen(sItem.c_str()));
-		char* pcAgtIP = &sAgentIP[0u];
-
-		mTCPCommunication.TCPSockInit(iTCPSocket);
-		bCnctFlag = mTCPCommunication.TryCnct(iTCPSocket, pcAgtIP, MY_TCP_PORT);
-		if(bCnctFlag == TRUE)
-		{
-			//cpHDDUsage = mTCPCommunication.ReqRsc(iTCPSocket, fCPUUsage, dwRAMUsage);
-			//sHDDUsage = &cpHDDUsage;
-			//memcpy(&cHDDUSage, sHDDUsage.c_str(), strlen(sHDDUsage.c_str()));
-			memcpy(&cHDDUSage, mTCPCommunication.ReqRsc(iTCPSocket, fCPUUsage, dwRAMUsage), 4096);
-		}
-
-		mTCPCommunication.TCPSockInit(iTCPSocket);         
-		bCnctFlag = mTCPCommunication.TryCnct(iTCPSocket, pcAgtIP, MY_TCP_PORT);
-		if(bCnctFlag == TRUE)
-		{
-			mTCPCommunication.LogListReq(iTCPSocket, pcAgtIP);
-		}
-
-		Sleep(5);
-
-		//CClassView *pcThis = (CClassView*)pParam;
-		//::PostMessage(pcThis->GetSafeHwnd(), WM_TREEVIEW_REFRESH_EVENT, (WPARAM)current_item, 0);
-		//::SendMessage(pcThis->GetSafeHwnd(), WM_TREEVIEW_REFRESH_EVENT, (WPARAM)current_item, 0);
-		//AfxGetMainWnd()->SendMessage(WM_TREEVIEW_REFRESH_EVENT, 0, 0);
-	}
-
-	CClassView *pcThis1 = (CClassView*)pParam;
-	::PostMessage(pcThis1->GetSafeHwnd(), WM_TREEVIEW_PVIEW_EVENT, 0, 0);
-
-/*
 // 	//Agent IP저장되는 변수
 // 	string sAgentIP = "";
 // 	//Agent 이름 저장되는 변수
@@ -1148,8 +1053,6 @@ UINT CClassView::Thread_RcsReq_Click(LPVOID pParam)
 		::PostMessage(pcThis1->GetSafeHwnd(), WM_TREEVIEW_PVIEW_EVENT, 0, 0);
 		
 	}
-	*/
-
 	return 0;
 }
 
@@ -1193,7 +1096,7 @@ BOOL CClassView::PreTranslateMessage(MSG* pMsg)
 			CString csrightbuf;
 			cstr.Format("%s", cHDDUSage);
 			csleftbuf = cstr.Left(cstr.Find(_T("D")));
-			csrightbuf = cstr.Right(cstr.Find(_T("D")));
+			csrightbuf = cstr.Right(cstr.Find(_T("D"))-1);
 			csleftbuf.Remove('\\');
 			csrightbuf.Remove('\\');
 
@@ -1246,7 +1149,7 @@ BOOL CClassView::PreTranslateMessage(MSG* pMsg)
 
 HRESULT CClassView::Treeview_Refresh(WPARAM wParam, LPARAM lParam)
 {
-	HTREEITEM hSelectItem = MyClassViewInformation.hSelectedItem;
+	HTREEITEM hSelectItem = (HTREEITEM)wParam;
 	HTREEITEM hChildItem = m_wndClassView.GetChildItem(hSelectItem);
 	HTREEITEM hGrandChildItem = m_wndClassView.GetChildItem(hChildItem);
 	list<string> AgentFileList;
@@ -1544,9 +1447,6 @@ void CClassView::OnMultiSelect()
 */
 void CClassView::OnAgentdirchange()
 {
-	//주석처리된 코드는 트리뷰 선택 기능을 위한 코드
-	//GetClickInformation 함수로 대체
-	/*
 	//선택한 아이템 획특
 	HTREEITEM current_item = m_wndClassView.GetSelectedItem();
 	HTREEITEM ParentItem;
@@ -1586,9 +1486,8 @@ void CClassView::OnAgentdirchange()
 	}
 	//pcAgentIP = new char[strlen(sAgentIP.c_str())];
 	//pcAgentIP =	&sAgentIP[0u];
-	*/
 
-	CString* csAgentIP = new CString(MyClassViewInformation.sAgentIP.c_str());
+	csAgentIP = new CString(sAgentIP.c_str());
 
 	CWinThread *AgtDirChgThread = NULL;
 	AgtDirChgThread = AfxBeginThread(Thread_AgentDirChange, csAgentIP);
@@ -1614,72 +1513,4 @@ void CClassView::OnSelchangedTree(NMHDR* pNMHDR, LRESULT* pResult)
 	CString data=m_wndClassView.GetItemText(pNMTreeView->itemNew.hItem);
 	//에디터 윈도에 설정한다.
 	*pResult = 0;
-}
-
-void CClassView::GetClickInformation()
-{
-	TV_HITTESTINFO hit_info;
-
-	// 화면상에서 마우스의 위치를 얻는다.
-	::GetCursorPos(&hit_info.pt);
-
-	// 얻은 마우스 좌표를 트리컨트롤 기준의 좌표로 변경한다.
-	::ScreenToClient(m_wndClassView.m_hWnd, &hit_info.pt);
-
-	// 현재 마우스 좌표가 위치한 항목 정보를 얻는다.
-	HTREEITEM current_item = m_wndClassView.HitTest(&hit_info);
-	HTREEITEM Current_PItem;
-	HTREEITEM ChildITem;
-	HTREEITEM ListITem;
-	HTREEITEM Grandparent;
-
-	list<string> LogList;
-
-	int iIndex;
-
-	string sItem = "";
-	string sChildItem = "";
-	string sPItem = "";
-	string sGPItem = "";
-	string sAgentIP = "";
-	CString* csAgentIP;
-
-	if(current_item != NULL)
-	{
-		// 마우스가 위치한 항목을 찾았다면 해당 항목을 선택한다.
-		m_wndClassView.Select(current_item, TVGN_CARET);
-		sItem = m_wndClassView.GetItemText(current_item);
-
-		Current_PItem = m_wndClassView.GetParentItem(current_item);
-		sPItem = m_wndClassView.GetItemText(Current_PItem);
-
-		Grandparent = m_wndClassView.GetParentItem(Current_PItem);
-		sGPItem = m_wndClassView.GetItemText(Grandparent);
-
-		ChildITem = m_wndClassView.GetChildItem(current_item);
-		sChildItem = m_wndClassView.GetItemText(ChildITem);
-
-		//트리뷰에서 IP를 클릭하였을 경우
-		if(sPItem == "노드 목록")
-		{
-			MyClassViewInformation.sID = "IP";
-			iIndex = sItem.find_first_of("/");
-			MyClassViewInformation.sAgentIP = sItem.substr(0, iIndex);
-			MyClassViewInformation.sAgentName = sItem.substr(iIndex+1, strlen(sItem.c_str()));
-			MyClassViewInformation.sFileDir = sChildItem;
-		}
-		//로그 항목을 클릭하였을 경우
-		else if(sGPItem == "노드 목록")
-		{
-			MyClassViewInformation.sID = "LOG";
-			MyClassViewInformation.sSelectedItem = sItem;
-			MyClassViewInformation.sAgentIP = sGPItem.substr(0, iIndex);
-			MyClassViewInformation.sAgentName = sGPItem.substr(iIndex+1, strlen(sGPItem.c_str()));
-			MyClassViewInformation.sFileDir = sPItem;
-		}
-		else
-		{
-
-		}
-	}
 }

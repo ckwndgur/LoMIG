@@ -26,19 +26,6 @@
 #define WM_TREEVIEW_REFRESH_EVENT WM_USER + 1
 #define WM_TREEVIEW_PVIEW_EVENT WM_USER + 2
 
-using namespace std;
-/*
-struct ClassViewInformation
-{
-	string sID;
-	string sSelectedItem;
-	HTREEITEM hSelectedItem;
-	string sAgentIP;
-	string sAgentName;
-	string sLogDir;
-	string slLogList;
-};
-*/
 class CClassToolBar : public CMFCToolBar
 {
 
@@ -57,8 +44,6 @@ public:
 
 	void AdjustLayout();
 	void OnChangeVisualStyle();
-
-	//struct ClassViewInformation MyClassViewInformation;
 
 	//UDPCommunication mUDPCommunication;
 	SOCKADDR_IN AddrStruct;
@@ -89,7 +74,6 @@ public:
 	DWORD m_dwDragStart;
 	UINT m_nClickFlags;
 	/////////////////////////
-
 	void SocketBinding(int& iSocket, SOCKADDR_IN mSocketAddr, int iAddrFamily, long lSourceIP, int iSourcePort);
 	void DisplayAllElement_List(list<string> lList);
 	void RefreshClassView();
@@ -111,7 +95,7 @@ public:
 	CImageList m_ClassViewImages;
 	UINT m_nCurrSort;
 	BOOL	m_bMultiSelect;
-	void GetClickInformation();
+
 	void FillClassView();
 	static UINT Thread_AgentDirChange(LPVOID pParam);
 	static UINT Thread_Log_Req(LPVOID pParam);
@@ -156,3 +140,4 @@ public:
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnAgentdirchange();
 };
+
