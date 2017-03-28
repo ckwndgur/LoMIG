@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <ws2tcpip.h>             //ip_mreq 구조체 정의되어있음
+#include <ws2tcpip.h>             
 #include <windows.h>
 #include <tchar.h>
 #include <string>

@@ -18,6 +18,7 @@
 UDPCommunication mUDPCommunication;
 TCPCommunication mTCPCommunication;
 CViewTree m_wndClassView;
+
 int iUdpMultiSock, iUdpUniSock, iUdpSndSock;
 int iTCPSocket;
 static char* pcAgentIP;
@@ -262,7 +263,9 @@ void CClassView::FillClassView()
 				AgentXMLList.push_back(m_XMLManager.Parsing_Target_XML(sFileDIrChk, "AgentInfo", "AgentIP"));
 				AgentXMLList.push_back(m_XMLManager.Parsing_Target_XML(sFileDIrChk, "AgentInfo", "AgentName"));
 				AgentXMLList.push_back(m_XMLManager.Parsing_Target_XML(sFileDIrChk, "AgentInfo", "AgentLogFileDirectory"));
-				AgentXMLList.push_back(m_XMLManager.Parsing_Target_XML(sFileDIrChk, "AgentInfo", "AgentLogFileList"));
+				string sFileList = m_XMLManager.Parsing_Target_XML(sFileDIrChk, "AgentInfo", "AgentLogFileList");
+				sFileList = sFileList.substr(0, strlen(sFileList.c_str())-1);
+				AgentXMLList.push_back(sFileList);
 			}
 		}
 	}while(FindNextFile(hFind, &FindData));
@@ -1094,7 +1097,7 @@ BOOL CClassView::PreTranslateMessage(MSG* pMsg)
 			CString csrightbuf;
 			cstr.Format("%s", cHDDUSage);
 			csleftbuf = cstr.Left(cstr.Find(_T("D")));
-			csrightbuf = cstr.Right(cstr.Find(_T("D")));
+			csrightbuf = cstr.Right(cstr.Find(_T("D"))-1);
 			csleftbuf.Remove('\\');
 			csrightbuf.Remove('\\');
 

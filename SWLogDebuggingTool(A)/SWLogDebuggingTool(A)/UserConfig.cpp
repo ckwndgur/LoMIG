@@ -19,7 +19,7 @@ string UserConfig::GetExeDirectory()
 	string buf;
 
 	GetModuleFileName(NULL, buffer, MAX_PATH);
-	string::size_type pos = string(buffer).find_last_of("\\/");
+	string::size_type pos = string(buffer).find_last_of("\\");
 	buf = string(buffer).substr(0, pos);
 	
 	buf = buf + "\\";
