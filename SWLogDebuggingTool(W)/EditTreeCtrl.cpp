@@ -45,7 +45,7 @@ enum ECmdHandler {
 	ID_ADD_ROOT,
 	ID_SORT_LEVEL,
 	ID_SORT_LEVELANDBELOW,
-
+	ID_OPEN,
 	ID_MAX_CMD
 };
 
@@ -74,6 +74,7 @@ CEditTreeCtrl::CEditTreeCtrl()
 	m_Keymap['S'      ][true ][false] = &CEditTreeCtrl::DoSortCurrentLevel;
 	m_Keymap['S'      ][true ][true ] = &CEditTreeCtrl::DoSortCurrentLevelAndBelow;
 
+ 	m_Commandmap[ID_OPEN]				;
 	m_Commandmap[ID_RENAME]		        = &CEditTreeCtrl::DoEditLabel;
 	m_Commandmap[ID_ADD_CHILD]          = &CEditTreeCtrl::DoInsertChild;
 	m_Commandmap[ID_ADD_ROOT]           = &CEditTreeCtrl::DoInsertRoot;
@@ -332,8 +333,8 @@ void CEditTreeCtrl::DragStart() {
 	ASSERT(m_pDragData != 0);
 	TRACE1(_T("CEditTreeCtrl::DragStart('%s')\n"), LPCTSTR(GetItemText(m_pDragData->GetDragItem())));
 
-	m_pDragData->StartDrag();
-	SelectItem(m_pDragData->GetDragItem());
+// 	m_pDragData->StartDrag();
+// 	SelectItem(m_pDragData->GetDragItem());
 }
 
 
@@ -341,9 +342,9 @@ void CEditTreeCtrl::DragMove() {
 	ASSERT(m_pDragData != 0);
 	TRACE1(_T("CEditTreeCtrl::DragMove('%s')\n"), LPCTSTR(GetItemText(m_pDragData->GetDragItem())));
 
-	EDropHint eHint;
-	HTREEITEM hDrop = GetDropTarget(eHint);
-	SetDragCursor(hDrop, eHint);
+// 	EDropHint eHint;
+// 	HTREEITEM hDrop = GetDropTarget(eHint);
+// 	SetDragCursor(hDrop, eHint);
 }
 
 
@@ -351,22 +352,22 @@ void CEditTreeCtrl::DragEnd() {
 	ASSERT(m_pDragData != 0);
 	TRACE1(_T("CEditTreeCtrl::DragEnd('%s')\n"), LPCTSTR(GetItemText(m_pDragData->GetDragItem())));
 
-	EDropHint eHint;
-	HTREEITEM hDrop = GetDropTarget(eHint);
-
-	if(m_pDragData->IsRightDragging()) {
-		if(eHint == DROP_NODROP)
-			DragStop();
-		else {
-			CPoint point;
-			GetCursorPos(&point);
-			DragDisplayContextMenu(point);
-		}
-	} else {
-		bool bCtrl = (::GetKeyState(VK_CONTROL) & 0x8000) != 0;
-		DragMoveItem(m_pDragData->GetDragItem(), hDrop, eHint, bCtrl);
-		DragStop();
-	}
+// 	EDropHint eHint;
+// 	HTREEITEM hDrop = GetDropTarget(eHint);
+// 
+// 	if(m_pDragData->IsRightDragging()) {
+// 		if(eHint == DROP_NODROP)
+// 			DragStop();
+// 		else {
+// 			CPoint point;
+// 			GetCursorPos(&point);
+// 			DragDisplayContextMenu(point);
+// 		}
+// 	} else {
+// 		bool bCtrl = (::GetKeyState(VK_CONTROL) & 0x8000) != 0;
+// 		DragMoveItem(m_pDragData->GetDragItem(), hDrop, eHint, bCtrl);
+// 		DragStop();
+// 	}
 }
 
 
@@ -730,21 +731,22 @@ void CEditTreeCtrl::OnRButtonUp(UINT nFlags, CPoint point)
 
 void CEditTreeCtrl::OnContextMenu(CWnd* pWnd, CPoint point) 
 {
-	DisplayContextMenu(point);
+	//DisplayContextMenu(point);
+	CTreeCtrl::OnContextMenu(pWnd, point);
 }
 
 void CEditTreeCtrl::OnRclick(NMHDR* pNMHDR, LRESULT* pResult) 
 {
-	*pResult = 1;
-	UINT flags;
-	CPoint point;
-	GetCursorPos(&point);
-	ScreenToClient(&point);
-	HTREEITEM hItem = HitTest(point, &flags);
-	if(hItem && (flags & TVHT_ONITEM) && !(flags & TVHT_ONITEMRIGHT))
-		SelectItem(hItem);
-	ClientToScreen(&point);
-	DisplayContextMenu(point);
+// 	*pResult = 1;
+// 	UINT flags;
+// 	CPoint point;
+// 	GetCursorPos(&point);
+// 	ScreenToClient(&point);
+// 	HTREEITEM hItem = HitTest(point, &flags);
+// 	if(hItem && (flags & TVHT_ONITEM) && !(flags & TVHT_ONITEMRIGHT))
+// 		SelectItem(hItem);
+// 	ClientToScreen(&point);
+// 	DisplayContextMenu(point);
 }
 
 void CEditTreeCtrl::OnSelchanging(NMHDR* pNMHDR, LRESULT* pResult) 

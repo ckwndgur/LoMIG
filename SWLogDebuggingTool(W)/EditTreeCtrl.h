@@ -181,6 +181,7 @@ class CEditTreeCtrl : public CTreeCtrl
 
 	// Keymapper
 	protected:
+		//virtual bool	DoOpen(HTREEITEM);
 		virtual bool	DoEditLabel(HTREEITEM);
 		virtual bool	DoInsertSibling(HTREEITEM);
 		virtual bool	DoInsertChild(HTREEITEM);
@@ -214,6 +215,7 @@ class CEditTreeCtrl : public CTreeCtrl
 
 			// is <hItem> a direct ancestor of <hCheck>?
 		bool		IsAncestor(HTREEITEM hItem, HTREEITEM hCheck) const;
+		
 
 		// Generated message map functions
 		//{{AFX_MSG(CEditTreeCtrl)

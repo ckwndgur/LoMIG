@@ -27,6 +27,7 @@ public:
 
 
 	BOOL m_bView;
+	BOOL m_bMultiSelect;
 
 	CString openfilepath;
 	BOOL m_openflag;

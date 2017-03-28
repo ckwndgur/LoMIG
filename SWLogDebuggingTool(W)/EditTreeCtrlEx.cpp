@@ -232,6 +232,20 @@ void CEditTreeCtrlEx::GetSelectedItemsWithoutDescendents(list<HTREEITEM> & listS
 	}
 }
 
+//by JH
+int CEditTreeCtrlEx::GetLevel(HTREEITEM hItem)
+{
+	int cnt = 0;
+	while(GetParentItem(hItem) != NULL)
+	{
+		hItem = GetParentItem(hItem);
+		cnt++;
+	}
+	return cnt;
+}
+
+
+
 
 void CEditTreeCtrlEx::DeselectTree(HTREEITEM hItem) {
 	while(hItem) {

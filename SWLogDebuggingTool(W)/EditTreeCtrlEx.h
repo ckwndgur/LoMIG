@@ -136,7 +136,12 @@ class CEditTreeCtrlEx : public CEditTreeCtrl
 		// Deselect a specific item.
 		// The focus does not change to the given item!
 		void		DeselectItem(HTREEITEM hItem);
-
+		
+		//by JH
+		int						GetLevel(HTREEITEM hItem);
+		void					GetSelectedItemsWithoutDescendents(std::list<HTREEITEM> & result);
+		
+		//std::list<CString>		GetSelectedFilePath(std::list<HTREEITEM> & result);
 
 	// Overrides from CEditTreeCtrl
 	protected:
@@ -173,7 +178,9 @@ class CEditTreeCtrlEx : public CEditTreeCtrl
 	protected:
 		void		ClearSelection(HTREEITEM Except, HTREEITEM Start);
 		void		DeselectTree(HTREEITEM hItem);
-		void		GetSelectedItemsWithoutDescendents(std::list<HTREEITEM> & result);
+		
+		
+		
 
 		// Generated message map functions
 		//{{AFX_MSG(CEditTreeCtrlEx)

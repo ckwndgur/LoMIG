@@ -24,7 +24,7 @@ IMPLEMENT_DYNCREATE(LogFileView, CScrollView)
 
 LogFileView::LogFileView()
 {
-
+	m_bMultiSelect = FALSE;
 }
 
 LogFileView::~LogFileView()
@@ -112,34 +112,35 @@ void LogFileView::SetScrollView(int x, int y)
 
 void LogFileView::OnDraw(CDC* pDC)
 {
-	/*
 	CDocument* pDoc = GetDocument();
-	// TODO: add draw code here
-
-	if (m_strView.size() >0)
+	
+	if (m_bMultiSelect)
 	{
-		//int C = 40;
-		int i = 0;
+		// TODO: add draw code here
 
+		int i = 0;
 		SetScrollView(m_textsize.cx * 8, m_textsize.cy*20);
 		//text size * 8 -> wnd x size
 		//first line height + total line number * each line height
 		for (list<CString>::iterator iterPos = m_strView.begin(); iterPos != m_strView.end(); ++iterPos, ++i)
 		{
-
-			pDC->TextOut(0, i*20, *iterPos);
+			//pDC->TextOut(0, i*20, *iterPos);
 		}
-	}
-	*/
+		m_bMultiSelect = FALSE;
+		Invalidate(true);
 
-	if(m_openflag == TRUE)
+	}
+	else
 	{
+		if(m_openflag == TRUE)
+		{
 
-		LogtoList(openfilepath);
-		//DLogtoList(openfilepath);
+			LogtoList(openfilepath);
+			//DLogtoList(openfilepath);
+		}
+
+		m_openflag = FALSE;
 	}
-
-	m_openflag = FALSE;
 }
 
 BOOL LogFileView::OnCommand(WPARAM wParam, LPARAM lParam)

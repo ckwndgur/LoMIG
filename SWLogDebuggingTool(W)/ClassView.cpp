@@ -92,7 +92,8 @@ BEGIN_MESSAGE_MAP(CClassView, CDockablePane)
 	ON_COMMAND(ID_AGENT_RscReq, &CClassView::OnAgentRscreq)
 	ON_NOTIFY(NM_RETURN, IDC_MY_TREE_VIEW, &OnSelchangedTree)
 	ON_NOTIFY(TVN_SELCHANGED, IDC_MY_TREE_VIEW, &OnSelchangedTree)
-	ON_NOTIFY(NM_CLICK, IDC_MY_TREE_VIEW, &OnAgentRcsoReq_OnClick)
+	//ON_NOTIFY(NM_CLICK, IDC_MY_TREE_VIEW, &OnAgentRcsoReq_OnClick)
+	ON_NOTIFY(NM_DBLCLK, IDC_MY_TREE_VIEW, &OnAgentRcsoReq_OnClick)
 	//ON_NOTIFY(TVN_ENDLABELEDIT, IDC_MY_TREE_VIEW, &OnEndLabelEditTreeCtrl)
 	ON_MESSAGE(WM_TREEVIEW_REFRESH_EVENT, Treeview_Refresh)
 
@@ -1004,7 +1005,8 @@ UINT CClassView::Thread_RcsReq_Click(LPVOID pParam)
 	char* cpHDDUsage;
 	string sHDDUsage = "";
 	string sPItem = "";
-	BOOL bCnctFlag;
+	BOOL bCnctFlag = FALSE;
+
 	if(current_item != NULL)
 	{
 		// 마우스가 위치한 항목을 찾았다면 해당 항목을 선택한다.

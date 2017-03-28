@@ -29,12 +29,7 @@ class CFileView : public CDockablePane
 public:
 	CFileView();
 	
-	CString getData();
-	CString csData;
 
-	void RefreshFileView();
-	void AdjustLayout();
-	void OnChangeVisualStyle();
 
 // 특성입니다.
 protected:
@@ -73,6 +68,19 @@ protected:
 
 	HTREEITEM m_hItemFirstSel;
 
+public:
+	CString csData;
+	
+	int checkMulti;
+
+	CString getData();
+	void RefreshFileView();
+	void AdjustLayout();
+	void OnChangeVisualStyle();
+// 	void OpenOneItem();
+// 	void OpenItems();
+
+
 private:
 	TextManager mTextManager;
 	TreeviewData *mSelTVData;
@@ -84,9 +92,19 @@ private:
 	int scroll_cx; 
 	int scroll_cy; 
 
+	void FindFileDirectory(CString pstr);
+	CString	GetFilePathAtFile(HTREEITEM hItem);
+	CString	GetFilePathBelowIP(HTREEITEM hItem);
+	CString	GetFilePathBelowDate(HTREEITEM hItem);
+	CString	GetFilePathBelowRoot(HTREEITEM hItem);
 	void MakeTreeview(CString pstr);
 	CSize Cal_scrollview(CString fulldirectory);
 	void MessageToPV(TV_HITTESTINFO hitinfo, HTREEITEM selitem);
+	void GetSelectedItems();
+	//bool Ancestor(HTREEITEM hItem, HTREEITEM hCheck);
+	void GetSelectedFilePath();
+	
+
 // 	void MultiSelection_ctl(TV_HITTESTINFO hitinfo, HTREEITEM selitem);
 // 	void MultiSelection_shift(TV_HITTESTINFO hitinfo, HTREEITEM selitem);
 // 	void ClearSelection();
@@ -95,6 +113,7 @@ private:
 	
 	
 public:
+
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
