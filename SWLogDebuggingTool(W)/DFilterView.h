@@ -17,10 +17,10 @@ protected:
 
 public:
 
-
-	list<CString> multi_filepath;
+	list<CString> multi_filepath; //JH
 	CString m_filePath;
 	CString lastPath;
+	
 
 	Filter mFilter;
 

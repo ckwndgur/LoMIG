@@ -407,6 +407,7 @@ void CFileView::OnFileOpen()
 		pView->m_lstcsNames = cslistFileNames;
 		pView->m_lstcsSizes = cslistFileSizes;
 		pDView->multi_filepath = cslistFilePaths;
+		pFtView->isMultiSelction = true;
 
 		cslistFilePaths.clear();
 		cslistItems.clear();

@@ -26,5 +26,6 @@ public:
 	CString MultiResultPath;
 
 
+
 	list<CString> cslstFilteredData;
 };

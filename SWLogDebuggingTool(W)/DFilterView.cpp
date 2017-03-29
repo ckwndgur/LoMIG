@@ -17,6 +17,8 @@
 
 
 int multiIndex;
+
+list<CString> cslstLastFilePath; //JH
 // DFilterView
 
 IMPLEMENT_DYNCREATE(DFilterView, CScrollView)
@@ -142,7 +144,7 @@ BOOL DFilterView::OnCommand(WPARAM wParam, LPARAM lParam)
 		WantedString.push_back(Wantedtotal);
 
 		multiIndex = 0;
-		for (list<CString>::iterator iterPos = multi_filepath.begin(); iterPos != multi_filepath.end(); ++iterPos)
+		for (list<CString>::iterator iterPos = multi_filepath.begin(); iterPos != multi_filepath.end(); ++iterPos) //JH
 		{
 			m_filePath = *iterPos;
 			PreFiltering(WantedString);
@@ -154,6 +156,7 @@ BOOL DFilterView::OnCommand(WPARAM wParam, LPARAM lParam)
 		m_strFilteredData.clear();
 		m_strFilteredData = mFilter.DoFilter(1, Wantederror, Title, m_filePath);
 */
+		
 		this->Invalidate(TRUE);
 
 		CSWLogDebuggingToolWApp *pApp = (CSWLogDebuggingToolWApp *)AfxGetApp();
@@ -164,7 +167,9 @@ BOOL DFilterView::OnCommand(WPARAM wParam, LPARAM lParam)
 		DFilterView *pDView = (DFilterView *)pChild->GetDFilterViewPane();
 		pFtView->btn_flag = true;
 		pFtView->ExhibitPath = lastPath;
+		pFtView->lstExhibitPath = cslstLastFilePath; // JH
 		pFtView->Invalidate(TRUE);
+		cslstLastFilePath.clear(); // JH
 
 
 	}
@@ -192,7 +197,10 @@ void DFilterView::PreFiltering(list<string> WantedLogString)
 	CString filterkeyword;
 	CString csfilepath, newpath, originfile, temp = ""; 
 
-	//list<CString> cslstfilepath; //JH
+	list<CString> cslstFilePath; //JH
+	list<CString> cslstNewFilePath; //JH
+	list<CString>::iterator iterPosMulti = multi_filepath.begin(); // JH
+
 
 	//for(cate = 0; cate <= 5; cate++)
 	while(filterproc)
@@ -246,6 +254,10 @@ void DFilterView::PreFiltering(list<string> WantedLogString)
 
 			if(multiflag == false)
 			{
+				if (iterPosMulti != multi_filepath.end()) //JH
+					++iterPosMulti; //JH
+				else
+					iterPosMulti = multi_filepath.begin(); // JH
 				
 				for (int i = 0; i<4; i++)
 				{
@@ -256,11 +268,15 @@ void DFilterView::PreFiltering(list<string> WantedLogString)
 				AfxExtractSubString(temp, temp, 0, '.');
 
 				csfilepath = csfilepath + "Debug" + '\\' + "(" + temp + ")" + Title.c_str();
+
+				cslstFilePath.push_back(csfilepath); // JH
+
 				originfile = temp;
 				FolderManager mFolderManager;
 				mFolderManager.MakeDirectory((LPSTR)((LPCTSTR)csfilepath));
 
 				newpath = csfilepath;
+				cslstNewFilePath.push_back(newpath); // JH
 
 
 //				m_strFilteredDataBuf = mFilter.MultiFilter(catenumberBuf, keywordBuf, Title, m_filePath, csfilepath, multiflag);
@@ -287,6 +303,7 @@ void DFilterView::PreFiltering(list<string> WantedLogString)
 				AfxExtractSubString(temp, temp, 0, '.');
 
 				csfilepath = csfilepath + "Debug" + '\\' + "(" + temp + ")" + Title.c_str();
+				cslstFilePath.push_back(csfilepath); // JH
 
 				FolderManager mFolderManager;
 				mFolderManager.MakeDirectory((LPSTR)((LPCTSTR)csfilepath));
@@ -298,7 +315,8 @@ void DFilterView::PreFiltering(list<string> WantedLogString)
 				remove(oldpath);
 				newpath = csfilepath;
 
-				//cslstfilepath.push_back(csfilepath); //JH
+				cslstNewFilePath.push_back(newpath); // JH
+
 				multiflag  =  true;
 			}
 		}
@@ -314,7 +332,9 @@ void DFilterView::PreFiltering(list<string> WantedLogString)
 	}
 
 	mFilter.MultiResultPath = csfilepath;
+
 	lastPath = csfilepath;
+	cslstLastFilePath.push_back(csfilepath); // JH
 
 }
 

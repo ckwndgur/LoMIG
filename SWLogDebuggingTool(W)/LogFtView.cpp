@@ -23,6 +23,8 @@ LogFtView::LogFtView()
 	m_textsize.cx = 0;
 	m_textsize.cy = 0;
 	btn_flag = false;
+	isMultiSelction = false;
+	listno = 0;
 }
 
 LogFtView::~LogFtView()
@@ -84,18 +86,40 @@ void LogFtView::OnDraw(CDC* pDC)
 	{
 		ifstream resultfile;
 		//resultfile.open(mFilter.MultiResultPath);
-		resultfile.open(ExhibitPath);
-		if(!resultfile.fail())
-		{
-			//ResultExhbView(mFilter.MultiResultPath);
-			ResultExhbView(ExhibitPath);			
-		}
-		else
-		{
+		m_list.DeleteAllItems();
 
+		for (list<CString>::iterator iterPos = lstExhibitPath.begin(); iterPos != lstExhibitPath.end(); ++iterPos)
+		{
+			resultfile.open(*iterPos);
+			bool isOpen = resultfile.fail();
+			if(!isOpen)
+			{
+				//ResultExhbView(mFilter.MultiResultPath);
+				ResultExhbView(*iterPos);			
+			}
+			else
+			{
+
+			}
+			resultfile.close();
 		}
+
+// 		resultfile.open(ExhibitPath);
+// 		if(!resultfile.fail())
+// 		{
+// 			//ResultExhbView(mFilter.MultiResultPath);
+// 			ResultExhbView(ExhibitPath);			
+// 		}
+// 		else
+// 		{
+// 
+// 		}
 
 		btn_flag = false;
+		isMultiSelction = false;
+
+		listno = 0; // JH
+		m_list.DeleteItem(listno); // JH
 
 		/*
 		CDocument* pDoc = GetDocument();
@@ -114,7 +138,6 @@ void LogFtView::OnDraw(CDC* pDC)
 void LogFtView::ResultExhbView(CString resultpath)
 {
 	btn_flag = false;
-	m_list.DeleteAllItems();
 
 	ifstream originfile;
 	originfile.open(resultpath);
@@ -122,9 +145,9 @@ void LogFtView::ResultExhbView(CString resultpath)
 	string alinelog;
 	alinelog = "";
 	CString lineno;
-	int valstart, valend, listno, strlength;
+	int valstart, valend, /*listno,*/ strlength;
 	valstart = 1;
-	valend = listno = strlength = 0;
+	valend /*= listno*/ = strlength = 0;
 	string liststr_buf;
 	CString liststr;//리스트뷰 서브아이템에 들어갈 값입니다.
 	liststr = "";
@@ -259,17 +282,15 @@ void LogFtView::ResultExhbView(CString resultpath)
 				}
 
 			}
-
-
 			alinelog = "";
 			valstart = 1;
 			valend = 0;
 			listno++;
 		}
 	}
+	originfile.close();
 
-	m_list.DeleteItem(listno);
-	listno = 0;	
+	
 }
 
 void LogFtView::initClistCnt()

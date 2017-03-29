@@ -29,12 +29,14 @@ public:
 	CString ExhibitPath;
 
 	list<CString> lstExhibitPath;
+	bool isMultiSelction;
 
 	//func
 private:
 	CWnd m_EditSearch;
 	CWnd m_ButtonSearch;
 	CComboBox m_ComboBox;
+	int listno;
 	//view
 	Filter mFilter;
 	//class
