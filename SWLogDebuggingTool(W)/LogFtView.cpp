@@ -132,8 +132,8 @@ void LogFtView::OnDraw(CDC* pDC)
 		}
 		*/
 	}
-
 }
+
 
 void LogFtView::ResultExhbView(CString resultpath)
 {
@@ -152,11 +152,19 @@ void LogFtView::ResultExhbView(CString resultpath)
 	CString liststr;//리스트뷰 서브아이템에 들어갈 값입니다.
 	liststr = "";
 
+	CString resultpath_buf = resultpath;
+	CString filename;
+	AfxExtractSubString(filename, resultpath_buf, 5, '\\');
+
+
+	m_list.InsertItem(listno, filename, 0); // JH
+	m_list.SetItemText(listno, R_PATHITEM, resultpath); // JH
+	listno = listno + 1;
+
 	while(!originfile.eof())
 	{
-		lineno.Format(_T("%d"), listno+1);
-		//m_list.InsertItem(listno, lineno, 0);//리스트뷰 아이템 추가합니다.
-
+		lineno.Format(_T("%d"), listno);
+		
 		getline(originfile, alinelog);//1개 라인을 스트링으로 읽어옵니다.
 
 		if (alinelog == "")//비어있는 로그 라인일 경우
@@ -289,8 +297,6 @@ void LogFtView::ResultExhbView(CString resultpath)
 		}
 	}
 	originfile.close();
-
-	
 }
 
 void LogFtView::initClistCnt()
