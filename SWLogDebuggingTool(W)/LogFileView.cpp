@@ -17,6 +17,10 @@
 #define LINEITEM	4
 #define DESITEM		5
 
+#define FILENAME	1
+#define FILEPATH	2
+#define FILESIZE	3
+
 
 // LogFileView
 
@@ -118,16 +122,18 @@ void LogFileView::OnDraw(CDC* pDC)
 	{
 		// TODO: add draw code here
 
-		int i = 0;
-		SetScrollView(m_textsize.cx * 8, m_textsize.cy*20);
-		//text size * 8 -> wnd x size
-		//first line height + total line number * each line height
-		for (list<CString>::iterator iterPos = m_strView.begin(); iterPos != m_strView.end(); ++iterPos, ++i)
-		{
-			//pDC->TextOut(0, i*20, *iterPos);
-		}
+// 		int i = 0;
+// 		SetScrollView(m_textsize.cx * 8, m_textsize.cy*20);
+// 		//text size * 8 -> wnd x size
+// 		//first line height + total line number * each line height
+// 		for (list<CString>::iterator iterPos = m_strView.begin(); iterPos != m_strView.end(); ++iterPos, ++i)
+// 		{
+// 			//pDC->TextOut(0, i*20, *iterPos);
+// 		}
+// 		m_bMultiSelect = FALSE;
+// 		Invalidate(true);
+		MultiLogFileList();
 		m_bMultiSelect = FALSE;
-		Invalidate(true);
 
 	}
 	else
@@ -141,6 +147,42 @@ void LogFileView::OnDraw(CDC* pDC)
 
 		m_openflag = FALSE;
 	}
+}
+
+void LogFileView::MultiLogFileList()
+{
+	CString lineno;
+	int i = 0;
+
+	m_OriginLoglist.InsertColumn(0, "No.",  LVCFMT_LEFT, 50);
+	m_OriginLoglist.InsertColumn(1, "FileName",  LVCFMT_LEFT, 100);
+	m_OriginLoglist.InsertColumn(2, "Directory",  LVCFMT_LEFT, 270);
+	m_OriginLoglist.InsertColumn(3, "FileSize",  LVCFMT_LEFT, 70);
+
+	
+	for (list<CString>::iterator iterPos = m_lstcsNames.begin(); iterPos != m_lstcsNames.end(); ++iterPos)
+	{
+		
+		lineno.Format(_T("%d"), i+1);
+		m_OriginLoglist.InsertItem(i, lineno, 0);
+ 		m_OriginLoglist.SetItemText(i, FILENAME, *iterPos);
+		i++;
+	}
+
+	i = 0;
+	for (list<CString>::iterator iterPos = m_lstcsPaths.begin(); iterPos != m_lstcsPaths.end(); ++iterPos)
+	{
+		m_OriginLoglist.SetItemText(i, FILEPATH, *iterPos); 
+		i++;
+	}
+
+	i = 0;
+	for (list<CString>::iterator iterPos = m_lstcsSizes.begin(); iterPos != m_lstcsSizes.end(); ++iterPos)
+	{
+		m_OriginLoglist.SetItemText(i, FILESIZE, *iterPos);  
+		i++;
+	}
+	
 }
 
 BOOL LogFileView::OnCommand(WPARAM wParam, LPARAM lParam)

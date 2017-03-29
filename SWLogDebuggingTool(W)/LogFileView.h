@@ -20,6 +20,10 @@ public:
 	// 	CComboBox m_ComboBox;
 
 	list<CString> m_strView;
+
+	list<CString> m_lstcsNames;
+	list<CString> m_lstcsPaths;
+	list<CString> m_lstcsSizes;
 	//	CString m_strViewPath;
 	CSize m_textsize;
 
@@ -45,6 +49,7 @@ public:
 #endif
 #endif
 	int LogtoList(CString filepath);
+	void MultiLogFileList();
 	void DLogtoList(CString filepath);
 	void ListtoLog();
 

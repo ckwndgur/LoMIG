@@ -16,13 +16,14 @@
 #include "FolderManager.h"
 
 
+int multiIndex;
 // DFilterView
 
 IMPLEMENT_DYNCREATE(DFilterView, CScrollView)
 
 DFilterView::DFilterView()
 {
-
+	multiIndex = 0;
 }
 
 DFilterView::~DFilterView()
@@ -140,7 +141,14 @@ BOOL DFilterView::OnCommand(WPARAM wParam, LPARAM lParam)
 		WantedString.push_back(Wanteddes);
 		WantedString.push_back(Wantedtotal);
 
-		PreFiltering(WantedString);
+		multiIndex = 0;
+		for (list<CString>::iterator iterPos = multi_filepath.begin(); iterPos != multi_filepath.end(); ++iterPos)
+		{
+			m_filePath = *iterPos;
+			PreFiltering(WantedString);
+			multiIndex++;
+		}
+		
 /*
 		string Title= mFilter.CreatingTime(Wantederror);
 		m_strFilteredData.clear();
@@ -183,6 +191,8 @@ void DFilterView::PreFiltering(list<string> WantedLogString)
 	bool filterproc = true;
 	CString filterkeyword;
 	CString csfilepath, newpath, originfile, temp = ""; 
+
+	//list<CString> cslstfilepath; //JH
 
 	//for(cate = 0; cate <= 5; cate++)
 	while(filterproc)
@@ -252,6 +262,12 @@ void DFilterView::PreFiltering(list<string> WantedLogString)
 
 				newpath = csfilepath;
 
+
+//				m_strFilteredDataBuf = mFilter.MultiFilter(catenumberBuf, keywordBuf, Title, m_filePath, csfilepath, multiflag);
+// 				for (list<CString>::iterator iterPos = m_strFilteredDataBuf.begin(); iterPos != m_strFilteredDataBuf.end(); ++iterPos)
+//JH			{
+// 					m_strFilteredData.push_back(*iterPos);
+// 				}
 				m_strFilteredData.clear();
 				m_strFilteredData = mFilter.MultiFilter(catenumberBuf, keywordBuf, Title, m_filePath, csfilepath, multiflag);
 
@@ -277,10 +293,12 @@ void DFilterView::PreFiltering(list<string> WantedLogString)
 
 				m_strFilteredData.clear();
 				m_strFilteredData = mFilter.MultiFilter(catenumberBuf, keywordBuf, Title, newpath, csfilepath, multiflag);
-
+				
 				memcpy(oldpath, (LPSTR)(LPCSTR)newpath, newpath.GetLength());
 				remove(oldpath);
 				newpath = csfilepath;
+
+				//cslstfilepath.push_back(csfilepath); //JH
 				multiflag  =  true;
 			}
 		}

@@ -28,6 +28,8 @@ public:
 	bool btn_flag;
 	CString ExhibitPath;
 
+	list<CString> lstExhibitPath;
+
 	//func
 private:
 	CWnd m_EditSearch;

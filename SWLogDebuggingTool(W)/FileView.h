@@ -91,7 +91,11 @@ private:
 	CString csTVDataFileName;
 	int scroll_cx; 
 	int scroll_cy; 
+	int iMultiCnt;
 
+	void GetFileNames();
+	void GetFileSizeForList();
+	CString GetFileSizeForCString(CString directory);
 	void FindFileDirectory(CString pstr);
 	CString	GetFilePathAtFile(HTREEITEM hItem);
 	CString	GetFilePathBelowIP(HTREEITEM hItem);

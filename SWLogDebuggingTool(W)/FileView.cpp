@@ -26,6 +26,7 @@ static char THIS_FILE[]=__FILE__;
 CFileView::CFileView()
 {
 	m_hItemFirstSel = NULL;
+	iMultiCnt = 0;
 }
 
 CFileView::~CFileView()
@@ -51,7 +52,9 @@ END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // CWorkspaceBar 메시지 처리기
 
+list<CString> cslistFileNames;
 list<CString> cslistFilePaths;
+list<CString> cslistFileSizes;
 list<HTREEITEM> cslistItems;
 
 int CFileView::OnCreate(LPCREATESTRUCT lpCreateStruct)
@@ -114,6 +117,8 @@ void CFileView::RefreshFileView()
 	
 	cslistFilePaths.clear();
 	cslistItems.clear();
+	cslistFileNames.clear();
+	cslistFileSizes.clear();
 
 }
 void CFileView::MakeTreeview(CString pstr) // Folder searching and make tree view + going to use SetItemData for saving information
@@ -213,6 +218,8 @@ void CFileView::OnContextMenu(CWnd* pWnd, CPoint point)
 		{
 			GetSelectedItems();
 			GetSelectedFilePath();
+			GetFileSizeForList();
+			GetFileNames();
 		}
 	}
 
@@ -225,6 +232,8 @@ void CFileView::GetSelectedItems() {
 		cslistItems.push_back(hItem);
 	}
 }
+
+
 
 void CFileView::GetSelectedFilePath()
 {
@@ -246,9 +255,9 @@ void CFileView::GetSelectedFilePath()
 			/*cslistFilePaths.push_back(temp);*/
 			break;
 		case 2 :
- 			temp = GetFilePathBelowIP(*it);
+			temp = GetFilePathBelowIP(*it);
 			FindFileDirectory(temp);
- 			/*cslistFilePaths.push_back(temp);*/
+			/*cslistFilePaths.push_back(temp);*/
 			break;
 		case 3 :
 			temp = GetFilePathAtFile(*it);
@@ -260,7 +269,27 @@ void CFileView::GetSelectedFilePath()
 	}
 	cslistFilePaths.sort();
 	cslistFilePaths.unique();
+
+}
+
+void CFileView::GetFileNames()
+{
 	
+	for (list<CString>::iterator iterPos = cslistFilePaths.begin(); iterPos != cslistFilePaths.end(); ++iterPos)
+	{
+		CString bufPath = *iterPos;
+		int cnt = m_TreeviewManager.GetCharNumber(bufPath, '\\') - 2;
+		CString temp;
+		AfxExtractSubString(temp, bufPath, cnt+2, '\\');
+
+		cslistFileNames.push_back(temp);
+	}
+}
+
+void CFileView::GetFileSizeForList()
+{
+	for (list<CString>::iterator iterPos = cslistFilePaths.begin(); iterPos != cslistFilePaths.end(); ++iterPos)
+		cslistFileSizes.push_back(GetFileSizeForCString(*iterPos));
 }
 
 void CFileView::FindFileDirectory(CString pstr)
@@ -288,8 +317,6 @@ void CFileView::FindFileDirectory(CString pstr)
 	}
 	finder.Close();
 }
-
-
 
 
 void CFileView::AdjustLayout()
@@ -320,7 +347,6 @@ void CFileView::OnFileOpen()
 
 	if ( checkMulti == 1 )
 	{
-		
 		ifstream originfile;
 		originfile.open(csTVDataFilePath);
 		
@@ -374,13 +400,18 @@ void CFileView::OnFileOpen()
 		DFilterView *pDView = (DFilterView *)pChild->GetDFilterViewPane();
 		
 		pDoc->SetTitle("MultiOpen");
-		pView->m_strView = cslistFilePaths;
+		pView->m_lstcsPaths = cslistFilePaths;
 		pView->m_bView = TRUE;
 		pView->m_textsize = Cal_scrollview(csTVDataFilePath);
 		pView->m_bMultiSelect = TRUE;
+		pView->m_lstcsNames = cslistFileNames;
+		pView->m_lstcsSizes = cslistFileSizes;
+		pDView->multi_filepath = cslistFilePaths;
 
 		cslistFilePaths.clear();
 		cslistItems.clear();
+		cslistFileNames.clear();
+		cslistFileSizes.clear();
 		pView->Invalidate(TRUE);
 
 	}
@@ -616,6 +647,19 @@ CString CFileView::GetFilePathBelowRoot(HTREEITEM hItem)
 	return path;
 }
 
+CString CFileView::GetFileSizeForCString(CString directory)
+{
+	HANDLE hFile;
+	hFile = ::CreateFile(directory, 0, 0, NULL, OPEN_EXISTING, 0, NULL);
+	UINT ifilesize = GetFileSize(hFile, NULL);
+	CString csfilesize = "";
+	csfilesize.Format(_T("%d"), ifilesize);
+
+	CloseHandle(hFile);
+
+	return csfilesize;
+}
+
 void CFileView::MessageToPV(TV_HITTESTINFO hitinfo, HTREEITEM selitem)
 {
 	CMainFrame* pFrame = (CMainFrame*)AfxGetMainWnd();
@@ -655,16 +699,11 @@ void CFileView::MessageToPV(TV_HITTESTINFO hitinfo, HTREEITEM selitem)
 			pProWnd->bCheckInfo = 3;
 			CString csbuf = "C:\\" + csSelectedDefault + "\\" + csSelectedDate + "\\" + csSelectedIP + "\\";
 
-			HANDLE hFile;
 			csSelectedDirectory += ".txt";
-			hFile = ::CreateFile(csSelectedDirectory, 0, 0, NULL, OPEN_EXISTING, 0, NULL);
-			UINT ifilesize = GetFileSize(hFile, NULL);
-			//ifilesize = mTextManager.GetFileSize((LPSTR)(LPCTSTR)csbuf, (LPSTR)(LPCTSTR)csSelectedFileName);
-			CString csfilesize = "";
-			csfilesize.Format(_T("%d"), ifilesize);
+			
+			CString csfilesize = GetFileSizeForCString(csSelectedDirectory);
+			
 			pProWnd->csWatcherFileSize = csfilesize + " Byte";
-
-			CloseHandle(hFile);
 
 			pProWnd->Invalidate(FALSE);
 		} 

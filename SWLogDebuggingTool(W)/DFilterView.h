@@ -18,6 +18,7 @@ protected:
 public:
 
 
+	list<CString> multi_filepath;
 	CString m_filePath;
 	CString lastPath;
 
@@ -41,6 +42,7 @@ public:
 	CWnd m_ButtonSearch;
 
 	list<CString> m_strFilteredData;
+	//list<CString> m_strFilteredDataBuf; // JH
 
 
 	CString filterform;
