@@ -212,12 +212,15 @@ void CFileView::OnContextMenu(CWnd* pWnd, CPoint point)
 			csTVDataFileName = pWndTree->GetItemText(hTreeItem);
 			HTREEITEM hTreeItem_buf = hTreeItem;
 
+			GetSelectedFilePathFromItem(hTreeItem);
+			GetFileSizeForList();
+			GetFileNames();
 			csTVDataFilePath = GetFilePathAtFile(hTreeItem);
 		}
 		else if ( checkMulti > 1 )
 		{
 			GetSelectedItems();
-			GetSelectedFilePath();
+			GetSelectedFilePathFromItems();
 			GetFileSizeForList();
 			GetFileNames();
 		}
@@ -235,37 +238,72 @@ void CFileView::GetSelectedItems() {
 
 
 
-void CFileView::GetSelectedFilePath()
+void CFileView::GetSelectedFilePathFromItems()
 {
 	for(list<HTREEITEM>::iterator it = cslistItems.begin(); it != cslistItems.end(); ++it)
 	{
-		int cnt = m_wndFileView.GetLevel(*it);
-		CString temp;
-		HTREEITEM hChildItem;
-		switch (cnt)
-		{
-		case 0 :
-			temp = GetFilePathBelowRoot(*it);
-			FindFileDirectory(temp);
-			/*cslistFilePaths.push_back(temp);*/
-			break;
-		case 1 :
-			temp = GetFilePathBelowDate(*it);
-			FindFileDirectory(temp);
-			/*cslistFilePaths.push_back(temp);*/
-			break;
-		case 2 :
-			temp = GetFilePathBelowIP(*it);
-			FindFileDirectory(temp);
-			/*cslistFilePaths.push_back(temp);*/
-			break;
-		case 3 :
-			temp = GetFilePathAtFile(*it);
-			cslistFilePaths.push_back(temp);
-			break;
-		default:
-			break;
-		}
+// 		int cnt = m_wndFileView.GetLevel(*it);
+// 		CString temp;
+// 		HTREEITEM hChildItem;
+// 		switch (cnt)
+// 		{
+// 		case 0 :
+// 			temp = GetFilePathBelowRoot(*it);
+// 			FindFileDirectory(temp);
+// 			/*cslistFilePaths.push_back(temp);*/
+// 			break;
+// 		case 1 :
+// 			temp = GetFilePathBelowDate(*it);
+// 			FindFileDirectory(temp);
+// 			/*cslistFilePaths.push_back(temp);*/
+// 			break;
+// 		case 2 :
+// 			temp = GetFilePathBelowIP(*it);
+// 			FindFileDirectory(temp);
+// 			/*cslistFilePaths.push_back(temp);*/
+// 			break;
+// 		case 3 :
+// 			temp = GetFilePathAtFile(*it);
+// 			cslistFilePaths.push_back(temp);
+// 			break;
+// 		default:
+// 			break;
+// 		}
+		GetSelectedFilePathFromItem(*it);
+	}
+// 	cslistFilePaths.sort();
+// 	cslistFilePaths.unique();
+
+}
+
+void CFileView::GetSelectedFilePathFromItem(HTREEITEM selectedItem)
+{
+	int cnt = m_wndFileView.GetLevel(selectedItem);
+	CString temp;
+	HTREEITEM hChildItem;
+	switch (cnt)
+	{
+	case 0 :
+		temp = GetFilePathBelowRoot(selectedItem);
+		FindFileDirectory(temp);
+		/*cslistFilePaths.push_back(temp);*/
+		break;
+	case 1 :
+		temp = GetFilePathBelowDate(selectedItem);
+		FindFileDirectory(temp);
+		/*cslistFilePaths.push_back(temp);*/
+		break;
+	case 2 :
+		temp = GetFilePathBelowIP(selectedItem);
+		FindFileDirectory(temp);
+		/*cslistFilePaths.push_back(temp);*/
+		break;
+	case 3 :
+		temp = GetFilePathAtFile(selectedItem);
+		cslistFilePaths.push_back(temp);
+		break;
+	default:
+		break;
 	}
 	cslistFilePaths.sort();
 	cslistFilePaths.unique();
@@ -347,40 +385,61 @@ void CFileView::OnFileOpen()
 
 	if ( checkMulti == 1 )
 	{
-		ifstream originfile;
-		originfile.open(csTVDataFilePath);
-		
-		if (!originfile.fail())
+		if (cslistFilePaths.size() == 1 )
 		{
-			if (csTVDataFilePath.GetLength() >0 )
-			{
-				CSWLogDebuggingToolWApp *pApp = (CSWLogDebuggingToolWApp *)AfxGetApp();
-				CSWLogDebuggingToolWDoc *pDoc = (CSWLogDebuggingToolWDoc *)pApp->pDocTemplate->OpenDocumentFile(csTVDataFilePath);
+			ifstream originfile;
+			originfile.open(csTVDataFilePath);
 
-				CMainFrame* pFrame = (CMainFrame*)AfxGetMainWnd();
-				CChildFrame *pChild = (CChildFrame *) pFrame->GetActiveFrame();
+			CSWLogDebuggingToolWApp *pApp = (CSWLogDebuggingToolWApp *)AfxGetApp();
+			CSWLogDebuggingToolWDoc *pDoc = (CSWLogDebuggingToolWDoc *)pApp->pDocTemplate->OpenDocumentFile(csTVDataFilePath);
 
-				LogFileView *pView = (LogFileView *)pChild->GetFileViewPane();
-				LogFtView *pFtView = (LogFtView *)pChild->GetFtViewPane();
-				DFilterView *pDView = (DFilterView *)pChild->GetDFilterViewPane();
+			CMainFrame* pFrame = (CMainFrame*)AfxGetMainWnd();
+			CChildFrame *pChild = (CChildFrame *) pFrame->GetActiveFrame();
 
-				pView->m_strView = mTextManager.ReadTextList((LPSTR)(LPCTSTR)csTVDataFilePath);
-				pView->m_bView = TRUE;
-				pView->m_textsize = Cal_scrollview(csTVDataFilePath);
+			LogFileView *pView = (LogFileView *)pChild->GetFileViewPane();
+			LogFtView *pFtView = (LogFtView *)pChild->GetFtViewPane();
+			DFilterView *pDView = (DFilterView *)pChild->GetDFilterViewPane();
 
-				pView->m_openflag = TRUE;
-				pView->openfilepath = csTVDataFilePath;
-				pFtView->m_strViewPath = csTVDataFilePath;
-				pDView->m_filePath = csTVDataFilePath;
-				pFtView->m_textsize = Cal_scrollview(csTVDataFilePath);
+			pView->m_strView = mTextManager.ReadTextList((LPSTR)(LPCTSTR)csTVDataFilePath);
+			pView->m_bView = TRUE;
+			pView->m_textsize = Cal_scrollview(csTVDataFilePath);
 
-				pView->Invalidate(TRUE);
+			pView->m_openflag = TRUE;
+			pView->openfilepath = csTVDataFilePath;
+			pFtView->m_strViewPath = csTVDataFilePath;
+			pDView->m_filePath = csTVDataFilePath;
+			pDView->multi_filepath.push_back(csTVDataFilePath);
+			pFtView->m_textsize = Cal_scrollview(csTVDataFilePath);
 
-			}
-			else
-			{
-				AfxMessageBox(TEXT("파일열기에 실패했습니다."));
-			}
+			pView->Invalidate(TRUE);
+
+		}
+		else if ( cslistFilePaths.size() > 1 )
+		{
+			CSWLogDebuggingToolWApp *pApp = (CSWLogDebuggingToolWApp *)AfxGetApp();
+			CSWLogDebuggingToolWDoc *pDoc = (CSWLogDebuggingToolWDoc *)pApp->pDocTemplate->OpenDocumentFile(NULL);
+
+			CMainFrame* pFrame = (CMainFrame*)AfxGetMainWnd();
+			CChildFrame *pChild = (CChildFrame *) pFrame->GetActiveFrame();
+
+			LogFileView *pView = (LogFileView *)pChild->GetFileViewPane();
+			LogFtView *pFtView = (LogFtView *)pChild->GetFtViewPane();
+			DFilterView *pDView = (DFilterView *)pChild->GetDFilterViewPane();
+
+			CSize textsize;
+			textsize.cx = 10;
+			textsize.cy = 10;
+
+			pDoc->SetTitle("MultiOpen");
+			pView->m_lstcsPaths = cslistFilePaths;
+			pView->m_bView = TRUE;
+			pView->m_textsize = textsize;
+			pView->m_bMultiSelect = TRUE;
+			pView->m_lstcsNames = cslistFileNames;
+			pView->m_lstcsSizes = cslistFileSizes;
+			pDView->multi_filepath = cslistFilePaths;
+
+			pView->Invalidate(TRUE);
 		}
 		else
 		{
@@ -407,15 +466,14 @@ void CFileView::OnFileOpen()
 		pView->m_lstcsNames = cslistFileNames;
 		pView->m_lstcsSizes = cslistFileSizes;
 		pDView->multi_filepath = cslistFilePaths;
-		pFtView->isMultiSelction = true;
 
-		cslistFilePaths.clear();
-		cslistItems.clear();
-		cslistFileNames.clear();
-		cslistFileSizes.clear();
 		pView->Invalidate(TRUE);
 
 	}
+	cslistFilePaths.clear();
+	cslistItems.clear();
+	cslistFileNames.clear();
+	cslistFileSizes.clear();
 	
 	// TODO: 여기에 명령 처리기 코드를 추가합니다.
 }

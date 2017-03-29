@@ -37,6 +37,7 @@ private:
 	CWnd m_ButtonSearch;
 	CComboBox m_ComboBox;
 	int listno;
+	
 	//view
 	Filter mFilter;
 	//class

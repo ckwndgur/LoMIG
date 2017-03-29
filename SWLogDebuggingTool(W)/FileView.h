@@ -106,7 +106,8 @@ private:
 	void MessageToPV(TV_HITTESTINFO hitinfo, HTREEITEM selitem);
 	void GetSelectedItems();
 	//bool Ancestor(HTREEITEM hItem, HTREEITEM hCheck);
-	void GetSelectedFilePath();
+	void GetSelectedFilePathFromItems();
+	void GetSelectedFilePathFromItem(HTREEITEM selectedItem);
 	
 
 // 	void MultiSelection_ctl(TV_HITTESTINFO hitinfo, HTREEITEM selitem);

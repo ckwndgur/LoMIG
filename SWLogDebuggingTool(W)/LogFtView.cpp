@@ -23,7 +23,6 @@ LogFtView::LogFtView()
 	m_textsize.cx = 0;
 	m_textsize.cy = 0;
 	btn_flag = false;
-	isMultiSelction = false;
 	listno = 0;
 }
 
@@ -116,7 +115,6 @@ void LogFtView::OnDraw(CDC* pDC)
 // 		}
 
 		btn_flag = false;
-		isMultiSelction = false;
 
 		listno = 0; // JH
 		m_list.DeleteItem(listno); // JH
@@ -151,151 +149,184 @@ void LogFtView::ResultExhbView(CString resultpath)
 	string liststr_buf;
 	CString liststr;//리스트뷰 서브아이템에 들어갈 값입니다.
 	liststr = "";
+	int firstline;
+	firstline = 0;
 
 	CString resultpath_buf = resultpath;
 	CString filename;
 	AfxExtractSubString(filename, resultpath_buf, 5, '\\');
 
-
+/*
 	m_list.InsertItem(listno, filename, 0); // JH
 	m_list.SetItemText(listno, R_PATHITEM, resultpath); // JH
 	listno = listno + 1;
-
+*/
 	while(!originfile.eof())
 	{
-		lineno.Format(_T("%d"), listno);
-		
-		getline(originfile, alinelog);//1개 라인을 스트링으로 읽어옵니다.
-
-		if (alinelog == "")//비어있는 로그 라인일 경우
+		if(firstline == 0)
 		{
-			m_list.SetItemText(listno, R_ERRORITEM, ""); //에러레벨을 추가합니다.
-			m_list.SetItemText(listno, R_DATEITEM, ""); //날짜를 추가합니다.
-			m_list.SetItemText(listno, R_PATHITEM, ""); //경로를 추가합니다.
-			m_list.SetItemText(listno, R_LINEITEM, ""); //라인을 추가합니다.
-			m_list.SetItemText(listno, R_DESITEM, ""); //설명을 추가합니다.
+			
+			m_list.InsertItem(listno, "", 0); //공백을 만듭니다.
+			m_list.SetItemText(listno, R_ERRORITEM, ""); //공백을 만듭니다.
+			m_list.SetItemText(listno, R_DATEITEM, ""); //공백을 만듭니다.
+			m_list.SetItemText(listno, R_PATHITEM, ""); //공백을 만듭니다.
+			m_list.SetItemText(listno, R_LINEITEM, ""); //공백을 만듭니다.
+			m_list.SetItemText(listno, R_DESITEM, ""); //공백을 만듭니다.
+
+			firstline = 1;
+
+			listno = listno + 1;
+
+			m_list.InsertItem(listno, filename, 0); // 파일이름을 입력합니다.
+			m_list.SetItemText(listno, R_ERRORITEM, ""); //공백을 만듭니다.
+			m_list.SetItemText(listno, R_DATEITEM, ""); //공백을 만듭니다.
+			m_list.SetItemText(listno, R_PATHITEM, resultpath); // 결과파일 경로를 추가합니다.
+			m_list.SetItemText(listno, R_LINEITEM, ""); //공백을 만듭니다.
+			m_list.SetItemText(listno, R_DESITEM, ""); //공백을 만듭니다.
+
+			listno = listno + 1;
+
 		}
+
 		else
 		{
-			valend = alinelog.find(":");
-			liststr_buf = alinelog.substr(0, valend);
-			liststr = liststr_buf.c_str();
-			m_list.InsertItem(listno, liststr, 0);//리스트뷰 아이템 추가합니다.
-			alinelog.erase(0, valend + 2);
+			lineno.Format(_T("%d"), listno);
 
-			valend = alinelog.find(")");
-			strlength = valend - valstart;
-			liststr_buf = alinelog.substr(valstart, strlength);		
-			liststr = liststr_buf.c_str();
-			m_list.SetItemText(listno, R_ERRORITEM, liststr); //에러레벨을 추가합니다.
-			alinelog.erase(0,strlength+2);
+			getline(originfile, alinelog);//1개 라인을 스트링으로 읽어옵니다.
 
-			valstart = alinelog.find("[") + 1;
-			valend = alinelog.find("]");
-			strlength = valend - valstart;
-			liststr_buf = alinelog.substr(valstart, strlength);
-			liststr = liststr_buf.c_str();
-			m_list.SetItemText(listno, R_DATEITEM, liststr); //날짜를 추가합니다.
-			alinelog.erase(0,strlength+4);
-
-			if (alinelog.find(".cpp") != -1)
+			if (alinelog == "")//비어있는 로그 라인일 경우
 			{
-				valstart = 0;
-				valend = alinelog.find(".cpp");
-				valend = valend  + 4;
-				strlength = valend - valstart;
-				liststr_buf = alinelog.substr(valstart, strlength);
-				liststr = liststr_buf.c_str();
-				m_list.SetItemText(listno, R_PATHITEM, liststr); //경로를 추가합니다.
-				alinelog.erase(0,strlength+1);
-			}
-
-			else if (alinelog.find(".h") != -1)
-			{
-				valstart = 0;
-				valend = alinelog.find(".h");
-				valend = valend  + 2;
-				strlength = valend - valstart;
-				liststr_buf = alinelog.substr(valstart, strlength);
-				liststr = liststr_buf.c_str();
-				m_list.SetItemText(listno, R_PATHITEM, liststr); //경로를 추가합니다.
-				alinelog.erase(0,strlength+1);
-			}
-
-			else if (alinelog.find(".cxx") != -1)
-			{
-				valstart = 0;
-				valend = alinelog.find(".cxx");
-				valend = valend  + 4;
-				strlength = valend - valstart;
-				liststr_buf = alinelog.substr(valstart, strlength);
-				liststr = liststr_buf.c_str();
-				m_list.SetItemText(listno, R_PATHITEM, liststr); //경로를 추가합니다.
-				alinelog.erase(0,strlength+1);
-			}
-
-			else if (alinelog.find(".c") != -1)
-			{
-				valstart = 0;
-				valend = alinelog.find(".c");
-				valend = valend  + 2;
-				strlength = valend - valstart;
-				liststr_buf = alinelog.substr(valstart, strlength);
-				liststr = liststr_buf.c_str();
-				m_list.SetItemText(listno, R_PATHITEM, liststr); //경로를 추가합니다.
-				alinelog.erase(0,strlength+1);
-			}
-
-			else
-			{
-			}
-
-			valstart = 0; //alinelog.find("]__") + 1;
-			valend = alinelog.find("_");
-			strlength = valend - valstart;
-			liststr_buf = alinelog.substr(valstart, strlength);
-			liststr = liststr_buf.c_str();
-			m_list.SetItemText(listno, R_LINEITEM, liststr); //라인을 추가합니다.
-			alinelog.erase(0,strlength);
-
-			
-			if(alinelog == "")
-			{
-				m_list.SetItemText(listno, R_DESITEM, "NULL"); //설명을 추가합니다.
+				m_list.SetItemText(listno, R_ERRORITEM, ""); //에러레벨을 추가합니다.
+				m_list.SetItemText(listno, R_DATEITEM, ""); //날짜를 추가합니다.
+				m_list.SetItemText(listno, R_PATHITEM, ""); //경로를 추가합니다.
+				m_list.SetItemText(listno, R_LINEITEM, ""); //라인을 추가합니다.
+				m_list.SetItemText(listno, R_DESITEM, ""); //설명을 추가합니다.
 			}
 			else
 			{
-				if(alinelog.find("_") != -1)
+				valend = alinelog.find(":");
+				liststr_buf = alinelog.substr(0, valend);
+				liststr = liststr_buf.c_str();
+				m_list.InsertItem(listno, liststr, 0);//리스트뷰 아이템 추가합니다.
+				alinelog.erase(0, valend + 2);
+
+				valend = alinelog.find(")");
+				strlength = valend - valstart;
+				liststr_buf = alinelog.substr(valstart, strlength);		
+				liststr = liststr_buf.c_str();
+				m_list.SetItemText(listno, R_ERRORITEM, liststr); //에러레벨을 추가합니다.
+				alinelog.erase(0,strlength+2);
+
+				valstart = alinelog.find("[") + 1;
+				valend = alinelog.find("]");
+				strlength = valend - valstart;
+				liststr_buf = alinelog.substr(valstart, strlength);
+				liststr = liststr_buf.c_str();
+				m_list.SetItemText(listno, R_DATEITEM, liststr); //날짜를 추가합니다.
+				alinelog.erase(0,strlength+4);
+
+				if (alinelog.find(".cpp") != -1)
 				{
-					alinelog.erase(0,1);
+					valstart = 0;
+					valend = alinelog.find(".cpp");
+					valend = valend  + 4;
+					strlength = valend - valstart;
+					liststr_buf = alinelog.substr(valstart, strlength);
+					liststr = liststr_buf.c_str();
+					m_list.SetItemText(listno, R_PATHITEM, liststr); //경로를 추가합니다.
+					alinelog.erase(0,strlength+1);
+				}
 
-					if (alinelog == "")
-					{
-						m_list.SetItemText(listno, R_DESITEM, "NULL"); //설명을 추가합니다.
-					}
-					else if (alinelog == " ")
-					{
-						m_list.SetItemText(listno, R_DESITEM, "NULL"); //설명을 추가합니다.
-					}
-					else
-					{
-						liststr = alinelog.c_str();
-						m_list.SetItemText(listno, R_DESITEM, liststr); //설명을 추가합니다.
-					}
+				else if (alinelog.find(".h") != -1)
+				{
+					valstart = 0;
+					valend = alinelog.find(".h");
+					valend = valend  + 2;
+					strlength = valend - valstart;
+					liststr_buf = alinelog.substr(valstart, strlength);
+					liststr = liststr_buf.c_str();
+					m_list.SetItemText(listno, R_PATHITEM, liststr); //경로를 추가합니다.
+					alinelog.erase(0,strlength+1);
+				}
+
+				else if (alinelog.find(".cxx") != -1)
+				{
+					valstart = 0;
+					valend = alinelog.find(".cxx");
+					valend = valend  + 4;
+					strlength = valend - valstart;
+					liststr_buf = alinelog.substr(valstart, strlength);
+					liststr = liststr_buf.c_str();
+					m_list.SetItemText(listno, R_PATHITEM, liststr); //경로를 추가합니다.
+					alinelog.erase(0,strlength+1);
+				}
+
+				else if (alinelog.find(".c") != -1)
+				{
+					valstart = 0;
+					valend = alinelog.find(".c");
+					valend = valend  + 2;
+					strlength = valend - valstart;
+					liststr_buf = alinelog.substr(valstart, strlength);
+					liststr = liststr_buf.c_str();
+					m_list.SetItemText(listno, R_PATHITEM, liststr); //경로를 추가합니다.
+					alinelog.erase(0,strlength+1);
 				}
 
 				else
 				{
-					m_list.SetItemText(listno, R_DESITEM, "NULL"); //설명을 추가합니다.
 				}
 
+				valstart = 0; //alinelog.find("]__") + 1;
+				valend = alinelog.find("_");
+				strlength = valend - valstart;
+				liststr_buf = alinelog.substr(valstart, strlength);
+				liststr = liststr_buf.c_str();
+				m_list.SetItemText(listno, R_LINEITEM, liststr); //라인을 추가합니다.
+				alinelog.erase(0,strlength);
+
+
+				if(alinelog == "")
+				{
+					m_list.SetItemText(listno, R_DESITEM, "NULL"); //설명을 추가합니다.
+				}
+				else
+				{
+					if(alinelog.find("_") != -1)
+					{
+						alinelog.erase(0,1);
+
+						if (alinelog == "")
+						{
+							m_list.SetItemText(listno, R_DESITEM, "NULL"); //설명을 추가합니다.
+						}
+						else if (alinelog == " ")
+						{
+							m_list.SetItemText(listno, R_DESITEM, "NULL"); //설명을 추가합니다.
+						}
+						else
+						{
+							liststr = alinelog.c_str();
+							m_list.SetItemText(listno, R_DESITEM, liststr); //설명을 추가합니다.
+						}
+					}
+
+					else
+					{
+						m_list.SetItemText(listno, R_DESITEM, "NULL"); //설명을 추가합니다.
+					}
+
+				}
+				alinelog = "";
+				valstart = 1;
+				valend = 0;
+				listno++;
 			}
-			alinelog = "";
-			valstart = 1;
-			valend = 0;
-			listno++;
+
 		}
+		
 	}
+	firstline = 1;
 	originfile.close();
 }
 
