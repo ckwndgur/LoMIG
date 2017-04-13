@@ -165,11 +165,17 @@ void CFileView::MakeTreeview(CString pstr) // Folder searching and make tree vie
 		}
 		else
 		{
-			TreeviewData *mTreeviewData = new TreeviewData();
-			m_wndFileView.InsertItem(finder.GetFileTitle(), 1, 1, hInc);
-			mTreeviewData->setFileName(finder.GetFileName());
-			mTreeviewData->setFullDirectory(finder.GetFilePath());
-			m_wndFileView.SetItemData(hInc, (DWORD)mTreeviewData);
+			CString str = finder.GetFilePath();
+			treeindex = m_TreeviewManager.GetCharNumber(str, '\\') - 2;
+			if (treeindex != 3)
+			{
+				TreeviewData *mTreeviewData = new TreeviewData();
+				m_wndFileView.InsertItem(finder.GetFileTitle(), 1, 1, hInc);
+				mTreeviewData->setFileName(finder.GetFileName());
+				mTreeviewData->setFullDirectory(finder.GetFilePath());
+				m_wndFileView.SetItemData(hInc, (DWORD)mTreeviewData);
+			}
+			
 		}
 	}
 	finder.Close();

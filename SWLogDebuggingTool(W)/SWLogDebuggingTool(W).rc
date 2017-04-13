@@ -89,21 +89,21 @@ IDI_PROPERTIES_WND_HC   ICON                    "res\\properties_wnd_hc.ico"
 // Bitmap
 //
 
-IDR_MAINFRAME           BITMAP                  "res\\Toolbar.bmp"
-IDR_MAINFRAME_256       BITMAP                  "res\\Toolbar256.bmp"
-IDR_SORT                BITMAP                  "res\\sort.bmp"
-IDB_SORT_24             BITMAP                  "res\\sort_hc.bmp"
+//IDR_MAINFRAME           BITMAP                  "res\\Toolbar.bmp"
+//IDR_MAINFRAME_256       BITMAP                  "res\\Toolbar256.bmp"
+//IDR_SORT                BITMAP                  "res\\sort.bmp"
+//IDB_SORT_24             BITMAP                  "res\\sort_hc.bmp"
 IDB_FILE_VIEW           BITMAP                  "res\\fileview.bmp"
 IDB_FILE_VIEW_24        BITMAP                  "res\\fileview_hc.bmp"
 IDB_CLASS_VIEW          BITMAP                  "res\\classview.bmp"
 IDB_CLASS_VIEW_24       BITMAP                  "res\\classview_hc.bmp"
-IDR_EXPLORER            BITMAP                  "res\\explorer.bmp"
-IDB_EXPLORER_24         BITMAP                  "res\\explorer_hc.bmp"
+//IDR_EXPLORER            BITMAP                  "res\\explorer.bmp"
+//IDB_EXPLORER_24         BITMAP                  "res\\explorer_hc.bmp"
 IDR_MENU_IMAGES         BITMAP                  "res\\menuimages.bmp"
 IDB_MENU_IMAGES_24      BITMAP                  "res\\menuimages_hc.bmp"
-IDR_PROPERTIES          BITMAP                  "res\\properties.bmp"
-IDB_PROPERTIES_HC       BITMAP                  "res\\properties_hc.bmp"
-IDR_FILTER              BITMAP                  "res\\toolbar1.bmp"
+//IDR_PROPERTIES          BITMAP                  "res\\properties.bmp"
+//IDB_PROPERTIES_HC       BITMAP                  "res\\properties_hc.bmp"
+//IDR_FILTER              BITMAP                  "res\\toolbar1.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -120,7 +120,7 @@ BEGIN
     BUTTON      ID_EDIT_COPY
     BUTTON      ID_EDIT_PASTE
     SEPARATOR
-    BUTTON      ID_FILE_PRINT
+    //BUTTON      ID_FILE_PRINT
     BUTTON      ID_APP_ABOUT
 END
 
@@ -134,7 +134,7 @@ BEGIN
     BUTTON      ID_EDIT_COPY
     BUTTON      ID_EDIT_PASTE
     SEPARATOR
-    BUTTON      ID_FILE_PRINT
+    //BUTTON      ID_FILE_PRINT
     BUTTON      ID_APP_ABOUT
 END
 
@@ -183,24 +183,24 @@ END
 
 IDR_MAINFRAME MENU 
 BEGIN
-    POPUP "파일(&F)"
-    BEGIN
-        MENUITEM "새로 만들기(&N)\tCtrl+N",          ID_FILE_NEW
-        MENUITEM "열기(&O)...\tCtrl+O",           ID_FILE_OPEN
-        MENUITEM "닫기(&C)",                      ID_FILE_CLOSE
-        MENUITEM SEPARATOR
-        MENUITEM "인쇄 설정(&R)...",                ID_FILE_PRINT_SETUP
-        MENUITEM SEPARATOR
-        MENUITEM "최근에 사용한 파일",                  ID_FILE_MRU_FILE1, GRAYED
-        MENUITEM SEPARATOR
-        MENUITEM "끝내기(&X)",                     ID_APP_EXIT
-    END
+//     POPUP "파일(&F)"
+//     BEGIN
+//         MENUITEM "새로 만들기(&N)\tCtrl+N",          ID_FILE_NEW
+//         MENUITEM "열기(&O)...\tCtrl+O",           ID_FILE_OPEN
+//         MENUITEM "닫기(&C)",                      ID_FILE_CLOSE
+//         MENUITEM SEPARATOR
+//         MENUITEM "인쇄 설정(&R)...",                ID_FILE_PRINT_SETUP
+//         MENUITEM SEPARATOR
+//         MENUITEM "최근에 사용한 파일",                  ID_FILE_MRU_FILE1, GRAYED
+//         MENUITEM SEPARATOR
+//         MENUITEM "끝내기(&X)",                     ID_APP_EXIT
+//     END
     POPUP "보기(&V)"
     BEGIN
-        POPUP "도구 모음 및 도킹 창(&T)"
-        BEGIN
-            MENUITEM "<자리 표시자>",                    ID_VIEW_TOOLBAR
-        END
+/*        POPUP "도구 모음 및 도킹 창(&T)"*/
+//         BEGIN
+//             MENUITEM "<자리 표시자>",                    ID_VIEW_TOOLBAR
+//         END
         MENUITEM "상태 표시줄(&S)",                  ID_VIEW_STATUS_BAR
         POPUP "응용 프로그램 모양(&A)"
         BEGIN
@@ -218,44 +218,44 @@ BEGIN
             END
         END
     END
-    POPUP "도움말(&H)"
-    BEGIN
-        MENUITEM "SWLogDebuggingTool(W) 정보(&A)...", ID_APP_ABOUT
-    END
+//     POPUP "도움말(&H)"
+//     BEGIN
+//         MENUITEM "SWLogDebuggingTool(W) 정보(&A)...", ID_APP_ABOUT
+//     END
 END
 
 IDR_SWLogDebuggingTTYPE MENU 
 BEGIN
-    POPUP "파일(&F)"
-    BEGIN
-        MENUITEM "새로 만들기(&N)\tCtrl+N",          ID_FILE_NEW
-        MENUITEM "열기(&O)...\tCtrl+O",           ID_FILE_OPEN
-        MENUITEM "닫기(&C)",                      ID_FILE_CLOSE
-        MENUITEM "저장(&S)\tCtrl+S",              ID_FILE_SAVE
-        MENUITEM "다른 이름으로 저장(&A)...",           ID_FILE_SAVE_AS
-        MENUITEM SEPARATOR
-        MENUITEM "인쇄(&P)...\tCtrl+P",           ID_FILE_PRINT
-        MENUITEM "인쇄 미리 보기(&V)",                ID_FILE_PRINT_PREVIEW
-        MENUITEM "인쇄 설정(&R)...",                ID_FILE_PRINT_SETUP
-        MENUITEM SEPARATOR
-        MENUITEM "최근에 사용한 파일",                  ID_FILE_MRU_FILE1
-        MENUITEM SEPARATOR
-        MENUITEM "끝내기(&X)",                     ID_APP_EXIT
-    END
-    POPUP "편집(&E)"
-    BEGIN
-        MENUITEM "실행 취소(&U)\tCtrl+Z",           ID_EDIT_UNDO
-        MENUITEM SEPARATOR
-        MENUITEM "잘라내기(&T)\tCtrl+X",            ID_EDIT_CUT
-        MENUITEM "복사(&C)\tCtrl+C",              ID_EDIT_COPY
-        MENUITEM "붙여넣기(&P)\tCtrl+V",            ID_EDIT_PASTE
-    END
+//     POPUP "파일(&F)"
+//     BEGIN
+//         MENUITEM "새로 만들기(&N)\tCtrl+N",          ID_FILE_NEW
+//         MENUITEM "열기(&O)...\tCtrl+O",           ID_FILE_OPEN
+//         MENUITEM "닫기(&C)",                      ID_FILE_CLOSE
+//         MENUITEM "저장(&S)\tCtrl+S",              ID_FILE_SAVE
+//         MENUITEM "다른 이름으로 저장(&A)...",           ID_FILE_SAVE_AS
+//         MENUITEM SEPARATOR
+//         MENUITEM "인쇄(&P)...\tCtrl+P",           ID_FILE_PRINT
+//         MENUITEM "인쇄 미리 보기(&V)",                ID_FILE_PRINT_PREVIEW
+//         MENUITEM "인쇄 설정(&R)...",                ID_FILE_PRINT_SETUP
+//         MENUITEM SEPARATOR
+//         MENUITEM "최근에 사용한 파일",                  ID_FILE_MRU_FILE1
+//         MENUITEM SEPARATOR
+//         MENUITEM "끝내기(&X)",                     ID_APP_EXIT
+//     END
+//     POPUP "편집(&E)"
+//     BEGIN
+//         MENUITEM "실행 취소(&U)\tCtrl+Z",           ID_EDIT_UNDO
+//         MENUITEM SEPARATOR
+//         MENUITEM "잘라내기(&T)\tCtrl+X",            ID_EDIT_CUT
+//         MENUITEM "복사(&C)\tCtrl+C",              ID_EDIT_COPY
+//         MENUITEM "붙여넣기(&P)\tCtrl+V",            ID_EDIT_PASTE
+//     END
     POPUP "보기(&V)"
     BEGIN
-        POPUP "도구 모음 및 도킹 창(&T)"
-        BEGIN
-            MENUITEM "<자리 표시자>",                    ID_VIEW_TOOLBAR
-        END
+        /*POPUP "도구 모음 및 도킹 창(&T)"*/
+//         BEGIN
+//             MENUITEM "<자리 표시자>",                    ID_VIEW_TOOLBAR
+//         END
         MENUITEM "상태 표시줄(&S)",                  ID_VIEW_STATUS_BAR
         POPUP "응용 프로그램 모양(&A)"
         BEGIN
@@ -273,14 +273,14 @@ BEGIN
             END
         END
     END
-    POPUP "창(&W)"
-    BEGIN
-        MENUITEM "새 창(&N)",                     ID_WINDOW_NEW
-    END
-    POPUP "도움말(&H)"
-    BEGIN
-        MENUITEM "SWLogDebuggingTool(W) 정보(&A)...", ID_APP_ABOUT
-    END
+//     POPUP "창(&W)"
+//     BEGIN
+//         MENUITEM "새 창(&N)",                     ID_WINDOW_NEW
+//     END
+//     POPUP "도움말(&H)"
+//     BEGIN
+//         MENUITEM "SWLogDebuggingTool(W) 정보(&A)...", ID_APP_ABOUT
+//     END
     POPUP "Agent관련 기능"
     BEGIN
         MENUITEM "Agent정보 요청",                  ID_Info_Req
@@ -318,14 +318,14 @@ BEGIN
     BEGIN
         MENUITEM "열기(&O)",                      ID_OPEN
         MENUITEM "새로고침(&E)",                    ID_OPEN_WITH
-        MENUITEM SEPARATOR
-        MENUITEM "컴파일(&C)",                     ID_DUMMY_COMPILE
-        MENUITEM SEPARATOR
-        MENUITEM "잘라내기(&T)\tCtrl+X",            ID_EDIT_CUT
-        MENUITEM "복사(&C)\tCtrl+C",              ID_EDIT_COPY
-        MENUITEM "제거(&R)",                      ID_EDIT_CLEAR
-        MENUITEM SEPARATOR
-        MENUITEM "속성(&P)...",                   ID_PROPERTIES
+//         MENUITEM SEPARATOR
+//         MENUITEM "컴파일(&C)",                     ID_DUMMY_COMPILE
+//         MENUITEM SEPARATOR
+//         MENUITEM "잘라내기(&T)\tCtrl+X",            ID_EDIT_CUT
+//         MENUITEM "복사(&C)\tCtrl+C",              ID_EDIT_COPY
+//         MENUITEM "제거(&R)",                      ID_EDIT_CLEAR
+//         MENUITEM SEPARATOR
+//         MENUITEM "속성(&P)...",                   ID_PROPERTIES
     END
 END
 
@@ -486,14 +486,14 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDR_MAINFRAME           "LoMIG"
+    IDR_MAINFRAME           "LoGA"
     IDR_SWLogDebuggingTTYPE "\nSWLogDebuggingT\nSWLogDebuggingT\n\n\nSWLogDebuggingToolW.Document\nSWLogDebuggingTool(W).Document"
     IDS_WINDOWS_MANAGER     "창(&W)..."
 END
 
 STRINGTABLE 
 BEGIN
-    AFX_IDS_APP_TITLE       "LoMIG"
+    AFX_IDS_APP_TITLE       "LoGA"
     AFX_IDS_IDLEMESSAGE     "준비"
 END
 
