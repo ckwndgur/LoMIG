@@ -133,12 +133,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	DockPane(&m_wndFileView);
 	CDockablePane* pTabbedBar = NULL;
 	m_wndClassView.AttachToTabWnd(&m_wndFileView, DM_SHOW, TRUE, &pTabbedBar);
-/*	m_wndOutput.EnableDocking(CBRS_ALIGN_ANY);*/
-	/*DockPane(&m_wndOutput);*/
 	m_wndProperties.EnableDocking(CBRS_ALIGN_ANY);
 	DockPane(&m_wndProperties);
-	m_wndFilter.EnableDocking(CBRS_ALIGN_ANY);
-	DockPane(&m_wndFilter);
+// 	m_wndFilter.EnableDocking(CBRS_ALIGN_ANY);
+// 	DockPane(&m_wndFilter);
 
 	// 향상된 창 관리 대화 상자를 활성화합니다.
 	EnableWindowsDialog(ID_WINDOW_MANAGER, IDS_WINDOWS_MANAGER, TRUE);
@@ -246,14 +244,14 @@ BOOL CMainFrame::CreateDockingWindows()
 	}
 
 	// 필터 창을 만듭니다.
-	CString strFilterWnd;
-	bNameValid = strFilterWnd.LoadString(IDS_FILTER_WND);
-	//ASSERT(bNameValid);
-	if (!m_wndFilter.Create(strFilterWnd, this, CRect(0, 0, 100, 100), TRUE, ID_VIEW_FILTERWND, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CBRS_RIGHT | CBRS_FLOAT_MULTI))
-	{
-		TRACE0("필터 창을 만들지 못했습니다.\n");
-		return FALSE; // 만들지 못했습니다.
-	}
+// 	CString strFilterWnd;
+// 	bNameValid = strFilterWnd.LoadString(IDS_FILTER_WND);
+// 	//ASSERT(bNameValid);
+// 	if (!m_wndFilter.Create(strFilterWnd, this, CRect(0, 0, 100, 100), TRUE, ID_VIEW_FILTERWND, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CBRS_RIGHT | CBRS_FLOAT_MULTI))
+// 	{
+// 		TRACE0("필터 창을 만들지 못했습니다.\n");
+// 		return FALSE; // 만들지 못했습니다.
+// 	}
 
 	//m_FolderManager.FindDirectory("C:\\LogDebugging");
 
@@ -281,8 +279,8 @@ void CMainFrame::SetDockingWindowIcons(BOOL bHiColorIcons)
 	HICON hPropertiesBarIcon = (HICON) ::LoadImage(::AfxGetResourceHandle(), MAKEINTRESOURCE(bHiColorIcons ? IDI_PROPERTIES_WND_HC : IDI_PROPERTIES_WND), IMAGE_ICON, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), 0);
 	m_wndProperties.SetIcon(hPropertiesBarIcon, FALSE);
 
-	HICON hFilterBarIcon = (HICON) ::LoadImage(::AfxGetResourceHandle(), MAKEINTRESOURCE(bHiColorIcons ? IDI_PROPERTIES_WND_HC : IDI_PROPERTIES_WND), IMAGE_ICON, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), 0);
-	m_wndFilter.SetIcon(hFilterBarIcon, FALSE);
+// 	HICON hFilterBarIcon = (HICON) ::LoadImage(::AfxGetResourceHandle(), MAKEINTRESOURCE(bHiColorIcons ? IDI_PROPERTIES_WND_HC : IDI_PROPERTIES_WND), IMAGE_ICON, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), 0);
+// 	m_wndFilter.SetIcon(hFilterBarIcon, FALSE);
 
 	UpdateMDITabbedBarsIcons();
 }

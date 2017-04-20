@@ -43,7 +43,7 @@ protected:  // 컨트롤 모음이 포함된 멤버입니다.
 	CClassView        m_wndClassView;
 	COutputWnd        m_wndOutput;
 	CPropertiesWnd    m_wndProperties;
-	CFilterWnd		  m_wndFilter;
+	//CFilterWnd		  m_wndFilter;
 	
 public:
 	CDockablePane* GetPropertyViewPT();
